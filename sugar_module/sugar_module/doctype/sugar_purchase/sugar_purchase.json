@@ -1,0 +1,133 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "creation": "2026-07-21 19:38:26.757386",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_8owx",
+  "amended_from",
+  "supplier",
+  "company",
+  "warehouse",
+  "sugar_details_section",
+  "item",
+  "purchase_qty_quintal",
+  "purchase_qty_kg",
+  "purchase_rate",
+  "total_amount",
+  "status_section",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_8owx",
+   "fieldtype": "Section Break",
+   "label": "Purchase Information"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Sugar Purchase",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "sugar_details_section",
+   "fieldtype": "Section Break",
+   "label": "Sugar Details"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "purchase_qty_quintal",
+   "fieldtype": "Float",
+   "label": "Purchase Qty (Quintal)"
+  },
+  {
+   "fieldname": "purchase_qty_kg",
+   "fieldtype": "Float",
+   "label": "Purchase Qty (KG)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "purchase_rate",
+   "fieldtype": "Currency",
+   "label": "Purchase Rate"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status_section",
+   "fieldtype": "Section Break",
+   "label": "Status"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nSubmitted\nCancelled",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-07-23 10:24:38.989687",
+ "modified_by": "Administrator",
+ "module": "Sugar Module",
+ "name": "Sugar Purchase",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "search_fields": "supplier,purchase_rate",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

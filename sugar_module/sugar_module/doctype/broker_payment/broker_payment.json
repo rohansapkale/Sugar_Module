@@ -1,0 +1,115 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "BP-.YYYY.-.#####",
+ "creation": "2026-07-22 10:58:12.043211",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_qskv",
+  "amended_from",
+  "dispatch_entry",
+  "broker",
+  "customer",
+  "payment_date",
+  "payment_mode",
+  "utr_no",
+  "paid_amount",
+  "remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_qskv",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Broker Payment",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "dispatch_entry",
+   "fieldtype": "Link",
+   "label": "Dispatch Entry",
+   "options": "Dispatch Entry"
+  },
+  {
+   "fetch_from": "dispatch_entry.broker",
+   "fieldname": "broker",
+   "fieldtype": "Link",
+   "label": "Broker",
+   "options": "Broker",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "dispatch_entry.customer_name",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "payment_date",
+   "fieldtype": "Date",
+   "label": "Payment Date"
+  },
+  {
+   "fieldname": "payment_mode",
+   "fieldtype": "Select",
+   "label": "Payment Mode",
+   "options": "NEFT\nRTGS\nIMPS\nUPI\nCheque\nCash"
+  },
+  {
+   "fieldname": "utr_no",
+   "fieldtype": "Data",
+   "label": "UTR No"
+  },
+  {
+   "fieldname": "paid_amount",
+   "fieldtype": "Currency",
+   "label": "Paid Amount"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-07-22 11:08:13.419154",
+ "modified_by": "Administrator",
+ "module": "Sugar Module",
+ "name": "Broker Payment",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -5,6 +5,17 @@ app_description = "Sugar module with ERP system"
 app_email = "sapkalerohan07@gmail.com"
 app_license = "mit"
 
+fixtures = [
+    {
+        "dt": "Workspace",
+        "filters": [
+            ["title", "=", "Sugar Module"]
+        ]
+    }
+]
+
+
+
 # Apps
 # ------------------
 

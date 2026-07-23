@@ -1,0 +1,164 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "BA-.YYYY.-.#####",
+ "creation": "2026-07-21 19:45:57.490770",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_yjq6",
+  "amended_from",
+  "broker",
+  "company",
+  "warehouse",
+  "allocation_date",
+  "sugar_details_section",
+  "item",
+  "allocated_qty_quintal",
+  "allocated_qty_kg",
+  "rate",
+  "total_amount",
+  "tracking_tab",
+  "tracking_details_section",
+  "sold_qty_kg",
+  "pending_qty_kg",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_yjq6",
+   "fieldtype": "Section Break",
+   "label": "Basic  details"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Broker Allocation",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "broker",
+   "fieldtype": "Link",
+   "label": "Broker",
+   "options": "Broker"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "allocation_date",
+   "fieldtype": "Date",
+   "label": "Allocation Date"
+  },
+  {
+   "fieldname": "sugar_details_section",
+   "fieldtype": "Section Break",
+   "label": "Sugar details"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "allocated_qty_quintal",
+   "fieldtype": "Float",
+   "label": "Allocated Qty (Quintal)"
+  },
+  {
+   "fieldname": "allocated_qty_kg",
+   "fieldtype": "Float",
+   "label": "Allocated Qty (Kg)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rate",
+   "fieldtype": "Currency",
+   "label": "Rate"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tracking_tab",
+   "fieldtype": "Tab Break",
+   "label": "Tracking "
+  },
+  {
+   "fieldname": "tracking_details_section",
+   "fieldtype": "Section Break",
+   "label": "Tracking details"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "sold_qty_kg",
+   "fieldtype": "Float",
+   "label": "Sold Qty (Kg)",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "pending_qty_kg",
+   "fieldtype": "Float",
+   "label": "Pending Qty (Kg)",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Open\nPartially Sold\nCompleted\nCancelled"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-07-21 21:14:13.978276",
+ "modified_by": "Administrator",
+ "module": "Sugar Module",
+ "name": "Broker Allocation",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
