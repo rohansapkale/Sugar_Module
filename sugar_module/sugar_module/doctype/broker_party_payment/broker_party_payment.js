@@ -1,7 +1,7 @@
 // Copyright (c) 2026, Rohan Sapkale and contributors
 // For license information, please see license.txt
 
-// frappe.ui.form.on("Broker Allocation", {
+// frappe.ui.form.on("Broker Party Payment", {
 // 	refresh(frm) {
 
 // 	},

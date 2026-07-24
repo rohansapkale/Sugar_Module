@@ -6,7 +6,7 @@ import frappe
 from frappe.model.document import Document
 
 
-class BrokerPayment(Document):
+class BrokerPartyPayment(Document):
 
     def validate(self):
         self.validate_payment()

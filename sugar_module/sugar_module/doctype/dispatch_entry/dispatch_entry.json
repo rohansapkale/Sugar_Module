@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_bulk_edit": 1,
  "allow_rename": 1,
  "autoname": "DE-.YYYY.-.#####",
  "creation": "2026-07-21 20:28:56.577200",
@@ -13,7 +12,6 @@
   "allocation",
   "broker",
   "company",
-  "warehouse",
   "dispatch_date",
   "customer_details_section",
   "customer_name",
@@ -21,7 +19,6 @@
   "vehicle_tab",
   "vehicle_data_section",
   "vehicle_no",
-  "driver_name",
   "sugar_details_tab",
   "details_section",
   "item",
@@ -58,7 +55,7 @@
    "fieldname": "allocation",
    "fieldtype": "Link",
    "label": "Allocation ",
-   "options": "Broker Allocation"
+   "options": "Broker Quantity"
   },
   {
    "fetch_from": "allocation.broker",
@@ -75,21 +72,15 @@
    "options": "Company"
   },
   {
-   "fetch_from": "allocation.warehouse",
-   "fieldname": "warehouse",
-   "fieldtype": "Link",
-   "label": "Warehouse",
-   "options": "Warehouse"
-  },
-  {
    "fieldname": "customer_details_section",
    "fieldtype": "Section Break",
    "label": "Customer Details"
   },
   {
    "fieldname": "customer_name",
-   "fieldtype": "Data",
-   "label": "Customer Name"
+   "fieldtype": "Link",
+   "label": "Customer-Party Name",
+   "options": "Customer"
   },
   {
    "fieldname": "vehicle_tab",
@@ -105,11 +96,6 @@
    "fieldname": "vehicle_no",
    "fieldtype": "Data",
    "label": "Vehicle No"
-  },
-  {
-   "fieldname": "driver_name",
-   "fieldtype": "Data",
-   "label": "Driver Name"
   },
   {
    "fieldname": "sugar_details_tab",
@@ -192,7 +178,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-07-22 11:05:03.257387",
+ "modified": "2026-07-24 10:04:35.057739",
  "modified_by": "Administrator",
  "module": "Sugar Module",
  "name": "Dispatch Entry",
@@ -208,6 +194,20 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sugar Operations",
+   "select": 1,
    "share": 1,
    "submit": 1,
    "write": 1

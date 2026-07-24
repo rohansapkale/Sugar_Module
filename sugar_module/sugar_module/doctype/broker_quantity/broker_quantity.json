@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_bulk_edit": 1,
  "allow_rename": 1,
  "autoname": "BA-.YYYY.-.#####",
  "creation": "2026-07-21 19:45:57.490770",
@@ -19,6 +18,8 @@
   "allocated_qty_kg",
   "rate",
   "total_amount",
+  "column_break_nwci",
+  "sugar_purchase",
   "tracking_tab",
   "tracking_details_section",
   "sold_qty_kg",
@@ -36,7 +37,8 @@
    "fieldtype": "Link",
    "label": "Amended From",
    "no_copy": 1,
-   "options": "Broker Allocation",
+   "not_nullable": 1,
+   "options": "Broker Quantity",
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
@@ -128,16 +130,26 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "Open\nPartially Sold\nCompleted\nCancelled"
+  },
+  {
+   "fieldname": "column_break_nwci",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sugar_purchase",
+   "fieldtype": "Link",
+   "label": "Supplier Mill",
+   "options": "Sugar Purchase"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-07-21 21:14:13.978276",
+ "modified": "2026-07-23 17:18:38.731699",
  "modified_by": "Administrator",
  "module": "Sugar Module",
- "name": "Broker Allocation",
+ "name": "Broker Quantity",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
@@ -150,6 +162,20 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sugar Operations",
+   "select": 1,
    "share": 1,
    "submit": 1,
    "write": 1

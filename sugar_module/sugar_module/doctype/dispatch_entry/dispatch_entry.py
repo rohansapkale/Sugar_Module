@@ -23,14 +23,25 @@ class DispatchEntry(Document):
     def calculate_values(self):
 
         qty = self.dispatch_qty_quintal or 0
+        rate = self.rate or 0
 
+    # Convert Quintal to KG
         self.dispatch_qty_kg = qty * 100
 
-        self.total_amount = qty * (self.rate or 0)
+    # Add 5% GST
+        gst = rate * 5 / 100
+        final_rate = rate + gst
+
+    # Only if these fields exist in Dispatch Entry
+    # self.gst = gst
+    # self.final_rate = final_rate
+
+    # Total Amount = Qty(Qtl) × Rate with GST
+        self.total_amount = qty * final_rate
 
     def validate_quantity(self):
 
-        allocation = frappe.get_doc("Broker Allocation", self.allocation)
+        allocation = frappe.get_doc("Broker Quantity", self.allocation)
 
         pending = allocation.pending_qty_kg or 0
 
@@ -41,7 +52,7 @@ class DispatchEntry(Document):
 
     def update_allocation(self):
 
-        allocation = frappe.get_doc("Broker Allocation", self.allocation)
+        allocation = frappe.get_doc("Broker Quantity", self.allocation)
 
         sold = (allocation.sold_qty_kg or 0) + self.dispatch_qty_kg
 
@@ -57,7 +68,7 @@ class DispatchEntry(Document):
 
     def reverse_allocation(self):
 
-        allocation = frappe.get_doc("Broker Allocation", self.allocation)
+        allocation = frappe.get_doc("Broker Quantity", self.allocation)
 
         sold = (allocation.sold_qty_kg or 0) - self.dispatch_qty_kg
 

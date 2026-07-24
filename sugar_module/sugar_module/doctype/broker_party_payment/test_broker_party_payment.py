@@ -13,9 +13,9 @@ IGNORE_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 
 
 
-class IntegrationTestBrokerPayment(IntegrationTestCase):
+class IntegrationTestBrokerPartyPayment(IntegrationTestCase):
 	"""
-	Integration tests for BrokerPayment.
+	Integration tests for BrokerPartyPayment.
 	Use this class for testing interactions between multiple components.
 	"""
 

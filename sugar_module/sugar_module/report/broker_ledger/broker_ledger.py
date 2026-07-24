@@ -22,8 +22,7 @@ def get_columns():
         {
             "label": _("Broker"),
             "fieldname": "broker",
-            "fieldtype": "Link",
-            "options": "Broker",
+            "fieldtype": "Data",
             "width": 180,
         },
         {
@@ -50,19 +49,50 @@ def get_columns():
             "fieldtype": "Data",
             "width": 150,
         },
+        {
+            "label":_("Supplier"),
+            "fieldname":"supplier",
+            "fieldtype":"Link",
+            "options":"Supplier",
+            "width":180,
+        },
+
     ]
 
 
 def get_data(filters):
 
+    filter_dict = {"docstatus": 1}
+
+    # Broker Filter
+    if filters.get("broker"):
+        filter_dict["broker"] = filters.get("broker")
+
+    # From Date Filter
+    if filters.get("from_date"):
+        filter_dict["allocation_date"] = [">=", filters.get("from_date")]
+
+    # To Date Filter
+    if filters.get("to_date"):
+        if "allocation_date" in filter_dict:
+            filter_dict["allocation_date"] = [
+                "between",
+                [filters.get("from_date"), filters.get("to_date")],
+            ]
+        else:
+            filter_dict["allocation_date"] = [
+                "<=",
+                filters.get("to_date"),
+            ]
     allocations = frappe.get_all(
-        "Broker Allocation",
+        "Broker Quantity",
         fields=[
             "broker",
             "allocated_qty_quintal",
             "sold_qty_kg",
             "pending_qty_kg",
             "status",
+            "sugar_purchase",
         ],
         order_by="creation desc",
     )
@@ -71,13 +101,45 @@ def get_data(filters):
 
     for row in allocations:
 
+        supplier = ""
+        purchase_qty = 0
+        purchase_rate = 0
+        gst_rate = 5
+        final_rate = 0
+        total_amount = 0
+
+        broker_name = frappe.db.get_value(
+            "Broker",
+            row.broker,
+            "broker_name"
+        )
+
+
+
+        if row.sugar_purchase:
+
+            purchase = frappe.get_doc("Sugar Purchase", row.sugar_purchase)
+
+            supplier = purchase.supplier
+            purchase_qty = purchase.purchase_qty_quintal or 0
+            purchase_rate = purchase.purchase_rate or 0
+
+            final_rate = purchase_rate + ((purchase_rate * gst_rate) / 100)
+
+            total_amount = purchase_qty * final_rate
+
         data.append(
             {
-                "broker": row.broker,
+                "broker": broker_name,
                 "allocated_qty_quintal": row.allocated_qty_quintal,
                 "sold_qty_quintal": (row.sold_qty_kg or 0) / 100,
                 "pending_qty_quintal": (row.pending_qty_kg or 0) / 100,
                 "status": row.status,
+                "supplier": supplier,
+                "purchase_rate": purchase_rate,
+                "gst": gst_rate,
+                "final_rate": final_rate,
+                "total_amount": total_amount,
             }
         )
 

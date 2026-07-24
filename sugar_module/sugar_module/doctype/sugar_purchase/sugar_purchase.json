@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_bulk_edit": 1,
  "allow_rename": 1,
  "creation": "2026-07-21 19:38:26.757386",
  "doctype": "DocType",
@@ -10,7 +9,6 @@
   "amended_from",
   "supplier",
   "company",
-  "warehouse",
   "sugar_details_section",
   "item",
   "purchase_qty_quintal",
@@ -47,12 +45,6 @@
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company"
-  },
-  {
-   "fieldname": "warehouse",
-   "fieldtype": "Link",
-   "label": "Warehouse",
-   "options": "Warehouse"
   },
   {
    "fieldname": "sugar_details_section",
@@ -104,7 +96,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-07-23 10:24:38.989687",
+ "modified": "2026-07-23 18:15:26.611250",
  "modified_by": "Administrator",
  "module": "Sugar Module",
  "name": "Sugar Purchase",
@@ -119,6 +111,20 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sugar Operations",
+   "select": 1,
    "share": 1,
    "submit": 1,
    "write": 1

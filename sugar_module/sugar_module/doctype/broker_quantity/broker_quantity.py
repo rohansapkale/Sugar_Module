@@ -7,7 +7,7 @@ import frappe
 from frappe.model.document import Document
 
 
-class BrokerAllocation(Document):
+class BrokerQuantity(Document):
 
     def validate(self):
         self.calculate_values()
@@ -20,11 +20,22 @@ class BrokerAllocation(Document):
 
     def calculate_values(self):
 
-        qty = self.allocated_qty_quintal or 0
+        qty_qtl = self.allocated_qty_quintal or 0
         rate = self.rate or 0
 
-        self.allocated_qty_kg = qty * 100
-        self.total_amount = self.allocated_qty_kg * rate
+    # Convert Quintal to KG
+        self.allocated_qty_kg = qty_qtl * 100
+
+    # Add 5% GST
+        gst = rate * 5 / 100
+        final_rate = rate + gst
+
+    # Optional (only if these fields exist)
+    # self.gst_amount = gst
+    # self.final_rate = final_rate
+
+    # Total Amount = Quintal Qty × Final Rate
+        self.total_amount = qty_qtl * final_rate
 
         sold = self.sold_qty_kg or 0
 

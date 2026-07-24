@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_bulk_edit": 1,
  "allow_rename": 1,
  "autoname": "BP-.YYYY.-.#####",
  "creation": "2026-07-22 10:58:12.043211",
@@ -28,7 +27,7 @@
    "fieldtype": "Link",
    "label": "Amended From",
    "no_copy": 1,
-   "options": "Broker Payment",
+   "options": "Broker Party Payment",
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
@@ -51,7 +50,7 @@
    "fetch_from": "dispatch_entry.customer_name",
    "fieldname": "customer",
    "fieldtype": "Link",
-   "label": "Customer",
+   "label": "Customer-Party Name",
    "options": "Customer",
    "read_only": 1
   },
@@ -86,10 +85,10 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-07-22 11:08:13.419154",
+ "modified": "2026-07-24 10:04:07.670766",
  "modified_by": "Administrator",
  "module": "Sugar Module",
- "name": "Broker Payment",
+ "name": "Broker Party Payment",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
@@ -102,6 +101,20 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sugar Operations",
+   "select": 1,
    "share": 1,
    "submit": 1,
    "write": 1

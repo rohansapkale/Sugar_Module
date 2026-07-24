@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_bulk_edit": 1,
  "allow_rename": 1,
  "autoname": "BRK-.YYYY.-.#####",
  "creation": "2026-07-21 17:48:26.194293",
@@ -9,9 +8,6 @@
  "field_order": [
   "broker_name",
   "mobile_no",
-  "email",
-  "address",
-  "gst_number",
   "city",
   "state",
   "status"
@@ -23,21 +19,6 @@
    "in_list_view": 1,
    "label": "Broker Name",
    "reqd": 1
-  },
-  {
-   "fieldname": "email",
-   "fieldtype": "Data",
-   "label": "Email"
-  },
-  {
-   "fieldname": "address",
-   "fieldtype": "Small Text",
-   "label": "Address"
-  },
-  {
-   "fieldname": "gst_number",
-   "fieldtype": "Data",
-   "label": "GST Number"
   },
   {
    "fieldname": "city",
@@ -65,7 +46,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-07-21 19:36:48.136023",
+ "modified": "2026-07-24 09:39:00.505172",
  "modified_by": "Administrator",
  "module": "Sugar Module",
  "name": "Broker",
@@ -83,6 +64,19 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sugar Operations",
+   "select": 1,
+   "share": 1,
+   "write": 1
   }
  ],
  "row_format": "Dynamic",
@@ -90,5 +84,6 @@
  "search_fields": "broker_name",
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "broker_name"
 }

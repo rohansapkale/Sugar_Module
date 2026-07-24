@@ -17,14 +17,14 @@ def get_columns():
         {
             "label": "Broker",
             "fieldname": "broker",
-            "fieldtype": "Link",
-            "options": "Broker",
+            "fieldtype": "Data",
             "width": 180,
         },
         {
             "label": "Customer",
             "fieldname": "customer_name",
-            "fieldtype": "Data",
+            "fieldtype": "Link",
+	    "options":"customer",
             "width": 180,
         },
         {
@@ -42,12 +42,6 @@ def get_columns():
         {
             "label": "Qty (Qtl)",
             "fieldname": "dispatch_qty_quintal",
-            "fieldtype": "Float",
-            "width": 120,
-        },
-        {
-            "label": "Qty (Kg)",
-            "fieldname": "dispatch_qty_kg",
             "fieldtype": "Float",
             "width": 120,
         },
@@ -103,7 +97,7 @@ def get_data(filters):
         else:
             filter_dict["dispatch_date"] = ["<=", filters.get("to_date")]
 
-    return frappe.get_all(
+    dispatches = frappe.get_all(
         "Dispatch Entry",
         filters=filter_dict,
         fields=[
@@ -112,7 +106,6 @@ def get_data(filters):
             "vehicle_no",
             "dispatch_date",
             "dispatch_qty_quintal",
-            "dispatch_qty_kg",
             "rate",
             "total_amount",
             "paid_amount",
@@ -121,3 +114,18 @@ def get_data(filters):
         ],
         order_by="broker asc, dispatch_date asc",
     )
+
+    # Fetch all broker names once
+    broker_map = {
+        d.name: d.broker_name
+        for d in frappe.get_all(
+            "Broker",
+            fields=["name", "broker_name"]
+        )
+    }
+
+    # Replace Broker ID with Broker Name
+    for row in dispatches:
+        row["broker"] = broker_map.get(row["broker"], row["broker"])
+
+    return dispatches

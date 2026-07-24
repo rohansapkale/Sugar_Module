@@ -35,5 +35,14 @@ class SugarPurchase(Document):
         qty_qtl = self.purchase_qty_quintal or 0
         rate = self.purchase_rate or 0
 
-        self.purchase_qty_kg = qty_qtl * 100
-        self.total_amount = self.purchase_qty_kg * rate
+    # Convert Quintal to Kg
+        self.converted_qty_kg = qty_qtl * 100
+
+    # Calculate GST @5%
+        self.gst_amount = rate * 5 / 100
+
+    # Rate including GST
+        self.final_rate = rate + self.gst_amount
+
+    # Total Amount = Quantity (Quintal) × Final Rate
+        self.total_amount = qty_qtl * self.final_rate
