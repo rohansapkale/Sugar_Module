@@ -55,8 +55,9 @@
   },
   {
    "fieldname": "comment",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Comment",
+   "options": "Broker Quantity",
    "width": 180
   }
  ],
@@ -65,10 +66,10 @@
  "docstatus": 0,
  "doctype": "Report",
  "filters": [],
- "idx": 0,
+ "idx": 1,
  "is_standard": "Yes",
  "letter_head": null,
- "modified": "2026-07-23 17:02:21.873382",
+ "modified": "2026-07-24 10:42:41.277210",
  "modified_by": "Administrator",
  "module": "Sugar Module",
  "name": "Broker Ledger",

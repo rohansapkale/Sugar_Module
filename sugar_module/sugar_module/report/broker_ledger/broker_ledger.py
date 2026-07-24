@@ -56,6 +56,12 @@ def get_columns():
             "options":"Supplier",
             "width":180,
         },
+	{
+	    "label":_("Comment"),
+	    "fieldname":"comment",
+	    "fieldtype":"Data",
+	    "width":250,
+	},
 
     ]
 
@@ -93,6 +99,7 @@ def get_data(filters):
             "pending_qty_kg",
             "status",
             "sugar_purchase",
+	    "comment",
         ],
         order_by="creation desc",
     )
@@ -113,6 +120,7 @@ def get_data(filters):
             row.broker,
             "broker_name"
         )
+
 
 
 
@@ -140,6 +148,7 @@ def get_data(filters):
                 "gst": gst_rate,
                 "final_rate": final_rate,
                 "total_amount": total_amount,
+		"comment":row.comment,
             }
         )
 
