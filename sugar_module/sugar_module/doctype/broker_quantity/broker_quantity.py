@@ -5,7 +5,7 @@
 
 import frappe
 from frappe.model.document import Document
-
+from frappe.model.naming import make_autoname
 
 class BrokerQuantity(Document):
 
@@ -49,3 +49,17 @@ class BrokerQuantity(Document):
 
         else:
             self.status = "Completed"
+
+    def autoname(self):
+
+        broker_name = frappe.db.get_value(
+            "Broker",
+            self.broker,
+            "broker_name"
+        ) or self.broker
+
+        broker_name = broker_name.replace(" ", "").upper()
+
+        allocation_date = frappe.utils.getdate(self.allocation_date).strftime("%d%m%Y")
+
+        self.name = f"{broker_name}-{allocation_date}-{make_autoname('.####')}"
