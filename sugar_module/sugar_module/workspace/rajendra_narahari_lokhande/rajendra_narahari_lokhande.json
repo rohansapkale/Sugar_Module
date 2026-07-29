@@ -1,143 +1,177 @@
 {
  "app": "sugar_module",
  "charts": [],
- "content": "[{\"id\":\"TzIE7qAmHt\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Masters</b></span>\",\"col\":11}},{\"id\":\"cj_f5g5mK7\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Party Name\",\"col\":3}},{\"id\":\"HADctRDCP5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Supplier\",\"col\":3}},{\"id\":\"XxwC4FjowL\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Receipt\",\"col\":3}},{\"id\":\"c-k2ACB3Ri\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payment \",\"col\":3}},{\"id\":\"rLNyq-kPzV\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Purchase</b></span>\",\"col\":12}},{\"id\":\"tAx0PRjzFT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sugar Purchase\",\"col\":3}},{\"id\":\"cXQMTLLFCg\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sugar Payment\",\"col\":3}},{\"id\":\"thOWxtB4PB\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Broker</b></span>\",\"col\":12}},{\"id\":\"boxK6r0FFd\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker\",\"col\":3}},{\"id\":\"FPA7PrPx2w\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker Quantity\",\"col\":3}},{\"id\":\"B4fHpty9w2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatch Entry\",\"col\":3}},{\"id\":\"GWudRtaFwY\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker Party Payment\",\"col\":3}},{\"id\":\"DrobNn1_Z9\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Reports</b></span>\",\"col\":12}},{\"id\":\"0gxRfuPqQ5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker Ledger\",\"col\":3}},{\"id\":\"ehPfcWJhGq\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sugar Purchase Report\",\"col\":3}},{\"id\":\"_gJ5UUlSZV\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker Sales Register\",\"col\":3}},{\"id\":\"O-IRk-rZpF\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sugar Payment Register\",\"col\":3}}]",
+ "content": "[{\"id\":\"_17U9R_Ctj\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Purchases Quantity Total (Qtl)\",\"col\":4}},{\"id\":\"Mda-86iL0x\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Dispatched Qty (qtl)\",\"col\":4}},{\"id\":\"nhV7FTxQnE\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Broker-Party Remaining Payment\",\"col\":4}},{\"id\":\"MeqLxBFian\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Supplier Remaining Payment\",\"col\":4}},{\"id\":\"QN5T5b5X8a\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"t3gQ0p2_Jk\",\"type\":\"card\",\"data\":{\"card_name\":\"Master\",\"col\":4}},{\"id\":\"hHW6BQebwy\",\"type\":\"card\",\"data\":{\"card_name\":\"Broker Section\",\"col\":4}},{\"id\":\"5-doUuM1U4\",\"type\":\"card\",\"data\":{\"card_name\":\"Payment\",\"col\":4}}]",
  "creation": "2026-07-23 10:12:24.729282",
  "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
  "hide_custom": 0,
+ "icon": "factory",
  "idx": 0,
  "indicator_color": "green",
  "is_hidden": 0,
  "label": "Rajendra Narahari Lokhande",
  "link_type": "DocType",
- "links": [],
- "modified": "2026-07-28 18:02:21.976933",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Master",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Party Name",
+   "link_count": 0,
+   "link_to": "Customer",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Supplier",
+   "link_count": 0,
+   "link_to": "Supplier",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Receipt",
+   "link_count": 0,
+   "link_to": "Purchase Receipt",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Payment",
+   "link_count": 0,
+   "link_to": "Payment Entry",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Broker Section",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Broker Details",
+   "link_count": 0,
+   "link_to": "Broker",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Broker Quantity",
+   "link_count": 0,
+   "link_to": "Broker Quantity",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Broker Party Payment",
+   "link_count": 0,
+   "link_to": "Broker Party Payment",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Broker Register",
+   "link_count": 0,
+   "link_to": "Broker Sales Register",
+   "link_type": "Report",
+   "onboard": 0,
+   "report_ref_doctype": "Dispatch Entry",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Payment",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Sugar Purchase",
+   "link_count": 0,
+   "link_to": "Sugar Purchase",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Sugar Payment",
+   "link_count": 0,
+   "link_to": "Purchase Payment",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-07-29 15:59:28.062858",
  "modified_by": "Administrator",
  "module": "Sugar Module",
  "name": "Rajendra Narahari Lokhande",
- "number_cards": [],
+ "number_cards": [
+  {
+   "label": "Purchases Quantity Total (Qtl)",
+   "number_card_name": "Total Purchase"
+  },
+  {
+   "label": "Dispatched Qty (qtl)",
+   "number_card_name": "Total Dispatch"
+  },
+  {
+   "label": "Broker-Party Remaining Payment",
+   "number_card_name": "Outstanding Broker"
+  },
+  {
+   "label": "Supplier Remaining Payment",
+   "number_card_name": "Outstanding Supplier"
+  }
+ ],
  "owner": "Administrator",
  "parent_page": "Rajendra Narahari Lokhande",
  "public": 1,
  "quick_lists": [],
  "roles": [],
  "sequence_id": 0.0,
- "shortcuts": [
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Dispatch Entry",
-   "link_to": "Dispatch Entry",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Broker Party Payment",
-   "link_to": "Broker Party Payment",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "",
-   "label": "Party Name",
-   "link_to": "Customer",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Sugar Payment Register",
-   "link_to": "Sugar Payment Register",
-   "report_ref_doctype": "Purchase Payment",
-   "type": "Report"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Broker Quantity",
-   "link_to": "Broker Quantity",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Sugar Payment",
-   "link_to": "Purchase Payment",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Receipt",
-   "link_to": "Purchase Receipt",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Broker Ledger",
-   "link_to": "Broker Ledger",
-   "report_ref_doctype": "Broker Quantity",
-   "type": "Report"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Sugar Purchase",
-   "link_to": "Sugar Purchase",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Payment ",
-   "link_to": "Payment Entry",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "",
-   "label": "Broker",
-   "link_to": "Broker",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "",
-   "label": "Supplier",
-   "link_to": "Supplier",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Sugar Purchase Report",
-   "link_to": "Sugar Purchase Report",
-   "report_ref_doctype": "Sugar Purchase",
-   "type": "Report"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Broker Sales Register",
-   "link_to": "Broker Sales Register",
-   "report_ref_doctype": "Dispatch Entry",
-   "type": "Report"
-  }
- ],
+ "shortcuts": [],
  "title": "Rajendra Narahari Lokhande",
  "type": "Workspace"
 }
