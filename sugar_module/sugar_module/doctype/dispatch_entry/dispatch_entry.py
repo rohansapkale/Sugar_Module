@@ -14,6 +14,20 @@ class DispatchEntry(Document):
         self.calculate_values()
         self.validate_quantity()
 
+        broker_name = frappe.db.get_value(
+            "Broker",
+            self.broker,
+            "broker_name"
+         )
+
+        self.title = (
+            f"{broker_name} | "
+            f"{self.dispatch_qty_quintal} Qtl | "
+            f"{self.dispatch_date}"
+        )
+
+
+
     def on_submit(self):
         self.update_allocation()
 

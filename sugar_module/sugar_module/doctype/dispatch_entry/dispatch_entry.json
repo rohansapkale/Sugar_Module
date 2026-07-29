@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "DE-.YYYY.-.#####",
+ "autoname": "DIS-ENT-2026-.#####",
  "creation": "2026-07-21 20:28:56.577200",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -10,23 +10,21 @@
   "basic_details_column",
   "amended_from",
   "allocation",
-  "broker",
   "company",
+  "broker",
   "dispatch_date",
-  "customer_details_section",
+  "column_break_xsnf",
+  "vehicle_no",
   "customer_name",
   "status",
-  "vehicle_tab",
-  "vehicle_data_section",
-  "vehicle_no",
-  "sugar_details_tab",
+  "title",
   "details_section",
   "item",
   "dispatch_qty_quintal",
   "dispatch_qty_kg",
   "rate",
   "total_amount",
-  "payment_details_section",
+  "column_break_dguh",
   "paid_amount",
   "balance_amount",
   "payment_status"
@@ -54,6 +52,7 @@
   {
    "fieldname": "allocation",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Allocation ",
    "options": "Broker Quantity"
   },
@@ -72,35 +71,16 @@
    "options": "Company"
   },
   {
-   "fieldname": "customer_details_section",
-   "fieldtype": "Section Break",
-   "label": "Customer Details"
-  },
-  {
    "fieldname": "customer_name",
    "fieldtype": "Link",
    "label": "Customer-Party Name",
    "options": "Customer"
   },
   {
-   "fieldname": "vehicle_tab",
-   "fieldtype": "Tab Break",
-   "label": "Vehicle "
-  },
-  {
-   "fieldname": "vehicle_data_section",
-   "fieldtype": "Section Break",
-   "label": "Vehicle data"
-  },
-  {
    "fieldname": "vehicle_no",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Vehicle No"
-  },
-  {
-   "fieldname": "sugar_details_tab",
-   "fieldtype": "Tab Break",
-   "label": "Sugar details"
   },
   {
    "fieldname": "details_section",
@@ -150,11 +130,6 @@
    "label": "Dispatch Date"
   },
   {
-   "fieldname": "payment_details_section",
-   "fieldtype": "Section Break",
-   "label": "Payment Details"
-  },
-  {
    "fieldname": "paid_amount",
    "fieldtype": "Currency",
    "label": "Paid Amount",
@@ -172,13 +147,27 @@
    "label": "Payment Status",
    "options": "Unpaid\nPartially Paid\nPaid",
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_xsnf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_dguh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-07-24 10:04:35.057739",
+ "modified": "2026-07-29 09:56:08.903828",
  "modified_by": "Administrator",
  "module": "Sugar Module",
  "name": "Dispatch Entry",
@@ -218,5 +207,6 @@
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": [],
+ "title_field": "title",
  "track_changes": 1
 }

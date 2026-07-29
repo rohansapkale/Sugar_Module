@@ -10,6 +10,7 @@
   "amended_from",
   "dispatch_entry",
   "broker",
+  "broker_quantity",
   "customer",
   "payment_date",
   "payment_mode",
@@ -50,6 +51,7 @@
    "fetch_from": "dispatch_entry.customer_name",
    "fieldname": "customer",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Customer-Party Name",
    "options": "Customer",
    "read_only": 1
@@ -79,13 +81,21 @@
    "fieldname": "remarks",
    "fieldtype": "Small Text",
    "label": "Remarks"
+  },
+  {
+   "fetch_from": "dispatch_entry.allocation",
+   "fieldname": "broker_quantity",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Broker Quantity",
+   "options": "Broker Quantity"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-07-24 10:04:07.670766",
+ "modified": "2026-07-28 16:57:41.484131",
  "modified_by": "Administrator",
  "module": "Sugar Module",
  "name": "Broker Party Payment",

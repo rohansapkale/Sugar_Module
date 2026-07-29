@@ -1,7 +1,7 @@
 {
  "app": "sugar_module",
  "charts": [],
- "content": "[{\"id\":\"TzIE7qAmHt\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Masters</b></span>\",\"col\":11}},{\"id\":\"cj_f5g5mK7\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Party Name\",\"col\":3}},{\"id\":\"HADctRDCP5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Supplier\",\"col\":3}},{\"id\":\"rLNyq-kPzV\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Purchase</b></span>\",\"col\":12}},{\"id\":\"tAx0PRjzFT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sugar Purchase\",\"col\":3}},{\"id\":\"XxwC4FjowL\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Receipt\",\"col\":3}},{\"id\":\"c-k2ACB3Ri\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payment \",\"col\":3}},{\"id\":\"thOWxtB4PB\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Broker</b></span>\",\"col\":12}},{\"id\":\"boxK6r0FFd\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker\",\"col\":3}},{\"id\":\"FPA7PrPx2w\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker Quantity\",\"col\":3}},{\"id\":\"B4fHpty9w2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatch Entry\",\"col\":3}},{\"id\":\"GWudRtaFwY\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker Party Payment\",\"col\":3}},{\"id\":\"DrobNn1_Z9\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Reports</b></span>\",\"col\":12}},{\"id\":\"0gxRfuPqQ5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker Ledger\",\"col\":3}},{\"id\":\"ehPfcWJhGq\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sugar Purchase Report\",\"col\":3}},{\"id\":\"_gJ5UUlSZV\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker Sales Register\",\"col\":3}}]",
+ "content": "[{\"id\":\"TzIE7qAmHt\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Masters</b></span>\",\"col\":11}},{\"id\":\"cj_f5g5mK7\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Party Name\",\"col\":3}},{\"id\":\"HADctRDCP5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Supplier\",\"col\":3}},{\"id\":\"XxwC4FjowL\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Receipt\",\"col\":3}},{\"id\":\"c-k2ACB3Ri\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payment \",\"col\":3}},{\"id\":\"rLNyq-kPzV\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Purchase</b></span>\",\"col\":12}},{\"id\":\"tAx0PRjzFT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sugar Purchase\",\"col\":3}},{\"id\":\"cXQMTLLFCg\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sugar Payment\",\"col\":3}},{\"id\":\"thOWxtB4PB\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Broker</b></span>\",\"col\":12}},{\"id\":\"boxK6r0FFd\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker\",\"col\":3}},{\"id\":\"FPA7PrPx2w\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker Quantity\",\"col\":3}},{\"id\":\"B4fHpty9w2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatch Entry\",\"col\":3}},{\"id\":\"GWudRtaFwY\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker Party Payment\",\"col\":3}},{\"id\":\"DrobNn1_Z9\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Reports</b></span>\",\"col\":12}},{\"id\":\"0gxRfuPqQ5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker Ledger\",\"col\":3}},{\"id\":\"ehPfcWJhGq\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sugar Purchase Report\",\"col\":3}},{\"id\":\"_gJ5UUlSZV\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Broker Sales Register\",\"col\":3}},{\"id\":\"O-IRk-rZpF\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sugar Payment Register\",\"col\":3}}]",
  "creation": "2026-07-23 10:12:24.729282",
  "custom_blocks": [],
  "docstatus": 0,
@@ -13,7 +13,7 @@
  "label": "Rajendra Narahari Lokhande",
  "link_type": "DocType",
  "links": [],
- "modified": "2026-07-27 14:39:33.717098",
+ "modified": "2026-07-28 18:02:21.976933",
  "modified_by": "Administrator",
  "module": "Sugar Module",
  "name": "Rajendra Narahari Lokhande",
@@ -52,8 +52,24 @@
   {
    "color": "Grey",
    "doc_view": "List",
+   "label": "Sugar Payment Register",
+   "link_to": "Sugar Payment Register",
+   "report_ref_doctype": "Purchase Payment",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
    "label": "Broker Quantity",
    "link_to": "Broker Quantity",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Sugar Payment",
+   "link_to": "Purchase Payment",
    "stats_filter": "[]",
    "type": "DocType"
   },
