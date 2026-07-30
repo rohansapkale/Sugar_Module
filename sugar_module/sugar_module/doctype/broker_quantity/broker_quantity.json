@@ -10,16 +10,15 @@
   "amended_from",
   "broker",
   "company",
-  "warehouse",
   "allocation_date",
   "sugar_details_section",
   "item",
   "allocated_qty_quintal",
-  "allocated_qty_kg",
   "rate",
   "total_amount",
   "column_break_nwci",
   "sugar_purchase",
+  "supplier",
   "comment",
   "tracking_tab",
   "tracking_details_section",
@@ -57,12 +56,6 @@
    "options": "Company"
   },
   {
-   "fieldname": "warehouse",
-   "fieldtype": "Link",
-   "label": "Warehouse",
-   "options": "Warehouse"
-  },
-  {
    "fieldname": "allocation_date",
    "fieldtype": "Date",
    "label": "Allocation Date"
@@ -82,12 +75,6 @@
    "fieldname": "allocated_qty_quintal",
    "fieldtype": "Float",
    "label": "Allocated Qty (Quintal)"
-  },
-  {
-   "fieldname": "allocated_qty_kg",
-   "fieldtype": "Float",
-   "label": "Allocated Qty (Kg)",
-   "read_only": 1
   },
   {
    "fieldname": "rate",
@@ -139,20 +126,29 @@
   {
    "fieldname": "sugar_purchase",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Supplier Mill",
-   "options": "Sugar Purchase"
+   "options": "Sugar Purchase",
+   "reqd": 1
   },
   {
    "fieldname": "comment",
    "fieldtype": "Small Text",
    "label": "Comment"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-07-24 15:39:33.933267",
+ "modified": "2026-07-30 09:45:47.762409",
  "modified_by": "Administrator",
  "module": "Sugar Module",
  "name": "Broker Quantity",

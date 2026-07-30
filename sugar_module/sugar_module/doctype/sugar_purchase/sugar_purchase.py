@@ -1,3 +1,4 @@
+
 # Copyright (c) 2026, Rohan Sapkale and contributors
 # For license information, please see license.txt
 
@@ -35,14 +36,26 @@ class SugarPurchase(Document):
         qty_qtl = self.purchase_qty_quintal or 0
         rate = self.purchase_rate or 0
 
-    # Convert Quintal to Kg
+    # Convert Quintal to KG
         self.converted_qty_kg = qty_qtl * 100
 
-    # Calculate GST @5%
+    # GST 5%
         self.gst_amount = rate * 5 / 100
 
     # Rate including GST
         self.final_rate = rate + self.gst_amount
 
-    # Total Amount = Quantity (Quintal) × Final Rate
+    # Total Amount
         self.total_amount = qty_qtl * self.final_rate
+
+
+    # Available Stock = Purchased - Dispatched
+
+        dispatched = self.dispatched_qty_quintal or 0
+
+        self.available_qty_quintal = qty_qtl - dispatched
+
+        if self.available_qty_quintal < 0:
+            frappe.throw(
+                "Dispatch Quantity cannot exceed Purchased Quantity."
+            )

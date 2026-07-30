@@ -4,21 +4,25 @@
 # import frappe
 # Copyright (c) 2026, Rohan Sapkale and contributors
 
+# Copyright (c) 2026, Rohan Sapkale and contributors
+# For license information, please see license.txt
+
 import frappe
 from frappe.model.document import Document
+from sugar_module.utils.stock import refresh_dispatch_history
 
 
 class DispatchEntry(Document):
 
     def validate(self):
         self.calculate_values()
-        self.validate_quantity()
+        self.validate_dispatch_quantity()
 
         broker_name = frappe.db.get_value(
             "Broker",
             self.broker,
             "broker_name"
-         )
+        )
 
         self.title = (
             f"{broker_name} | "
@@ -26,72 +30,86 @@ class DispatchEntry(Document):
             f"{self.dispatch_date}"
         )
 
-
+        if self.sugar_purchase:
+            self.supplier = frappe.db.get_value(
+                "Sugar Purchase",
+                self.sugar_purchase,
+                "supplier"
+            )
 
     def on_submit(self):
-        self.update_allocation()
 
+        purchase = frappe.get_doc(
+            "Sugar Purchase",
+            self.sugar_purchase
+        )
+
+    # Validation
+        if self.dispatch_qty_quintal > purchase.available_qty_quintal:
+            frappe.throw(
+                f"Only {purchase.available_qty_quintal} Quintal is available."
+            )
+
+        purchase.dispatched_qty_quintal += self.dispatch_qty_quintal
+
+        purchase.available_qty_quintal = (
+            purchase.purchase_qty_quintal
+            - purchase.dispatched_qty_quintal
+        )
+
+        purchase.save(ignore_permissions=True)
+        refresh_dispatch_history(self.sugar_purchase)
     def on_cancel(self):
-        self.reverse_allocation()
 
+        purchase = frappe.get_doc(
+            "Sugar Purchase",
+            self.sugar_purchase
+        )
+
+        purchase.dispatched_qty_quintal -= self.dispatch_qty_quintal
+
+        purchase.available_qty_quintal = (
+            purchase.purchase_qty_quintal
+            - purchase.dispatched_qty_quintal
+        )
+
+        purchase.save(ignore_permissions=True)
+        refresh_dispatch_history(self.sugar_purchase)
     def calculate_values(self):
 
         qty = self.dispatch_qty_quintal or 0
         rate = self.rate or 0
 
-    # Convert Quintal to KG
+        # Convert Quintal to KG
         self.dispatch_qty_kg = qty * 100
 
-    # Add 5% GST
+        # GST
         gst = rate * 5 / 100
         final_rate = rate + gst
 
-    # Only if these fields exist in Dispatch Entry
-    # self.gst = gst
-    # self.final_rate = final_rate
-
-    # Total Amount = Qty(Qtl) × Rate with GST
+        # Total Amount
         self.total_amount = qty * final_rate
 
-    def validate_quantity(self):
 
-        allocation = frappe.get_doc("Broker Quantity", self.allocation)
+    def validate_dispatch_quantity(self):
 
-        pending = allocation.pending_qty_kg or 0
+        purchase = frappe.get_doc(
+            "Sugar Purchase",
+            self.sugar_purchase
+        )
 
-        if self.dispatch_qty_kg > pending:
+        available = purchase.available_qty_quintal or 0
+
+        if self.dispatch_qty_quintal > available:
+
             frappe.throw(
-                f"Only {pending} Kg is pending in this allocation."
+                f"""
+                Dispatch Quantity exceeds Available Stock.
+
+                Purchase : {purchase.name}
+
+                Available Qty : {available} Quintal
+
+                Dispatch Qty : {self.dispatch_qty_quintal} Quintal
+               """
             )
-
-    def update_allocation(self):
-
-        allocation = frappe.get_doc("Broker Quantity", self.allocation)
-
-        sold = (allocation.sold_qty_kg or 0) + self.dispatch_qty_kg
-
-        allocation.sold_qty_kg = sold
-        allocation.pending_qty_kg = allocation.allocated_qty_kg - sold
-
-        if allocation.pending_qty_kg == 0:
-            allocation.status = "Completed"
-        else:
-            allocation.status = "Open"
-
-        allocation.save(ignore_permissions=True)
-
-    def reverse_allocation(self):
-
-        allocation = frappe.get_doc("Broker Quantity", self.allocation)
-
-        sold = (allocation.sold_qty_kg or 0) - self.dispatch_qty_kg
-
-        allocation.sold_qty_kg = sold
-        allocation.pending_qty_kg = allocation.allocated_qty_kg - sold
-
-        if allocation.sold_qty_kg == 0:
-            allocation.status = "Open"
-        else:
-            allocation.status = "Partially Delivered"
-
-        allocation.save(ignore_permissions=True)

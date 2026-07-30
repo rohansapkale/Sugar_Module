@@ -19,8 +19,11 @@
   "paid_amount",
   "remaining_amount",
   "payment_status",
+  "dispatched_qty_quintal",
+  "available_qty_quintal",
   "status_section",
-  "status"
+  "status",
+  "dispatch_history"
  ],
  "fields": [
   {
@@ -118,13 +121,37 @@
    "fieldname": "purchase_date",
    "fieldtype": "Date",
    "label": "Purchase Date"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "dispatched_qty_quintal",
+   "fieldtype": "Float",
+   "label": "Dispatched Qty (Qtl)",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "available_qty_quintal",
+   "fieldtype": "Float",
+   "label": "Available Qty (Qtl)",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "dispatch_history",
+   "fieldtype": "Table",
+   "label": "Dispatch History",
+   "options": "Dispatch History",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-07-28 17:52:26.470622",
+ "modified": "2026-07-30 12:27:20.986708",
  "modified_by": "Administrator",
  "module": "Sugar Module",
  "name": "Sugar Purchase",

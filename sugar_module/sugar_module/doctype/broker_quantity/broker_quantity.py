@@ -2,7 +2,6 @@
 # For license information, please see license.txt
 
 # import frappe.model.document import Document
-
 import frappe
 from frappe.model.document import Document
 from frappe.model.naming import make_autoname
@@ -12,11 +11,67 @@ class BrokerQuantity(Document):
     def validate(self):
         self.calculate_values()
 
+        if self.sugar_purchase:
+            self.supplier = frappe.db.get_value(
+                "Sugar Purchase",
+                self.sugar_purchase,
+                "supplier"
+            )
+
+
     def on_submit(self):
         self.status = "Open"
 
+        purchase = frappe.get_doc(
+            "Sugar Purchase",
+            self.sugar_purchase
+        )
+
+        purchase_qty = purchase.purchase_qty_quintal or 0
+        allocated_qty = purchase.allocated_qty_quintal or 0
+
+        available_qty = purchase_qty - allocated_qty
+
+        if self.allocated_qty_quintal > available_qty:
+            frappe.throw(
+                f"Only {available_qty} Quintal is available."
+            )
+
+        purchase.save(ignore_permissions=True)
+
+
+
     def on_cancel(self):
-        self.status = "Cancelled"
+
+        self.status = "Open"
+
+        purchase = frappe.get_doc(
+            "Sugar Purchase",
+            self.sugar_purchase
+        )
+
+        purchase_qty = purchase.purchase_qty_quintal or 0
+        allocated_qty = purchase.allocated_qty_quintal or 0
+
+        available_qty = purchase_qty - allocated_qty
+
+        if self.allocated_qty_quintal > available_qty:
+            frappe.throw(
+                f"Only {available_qty} Quintal is available."
+            )
+
+         
+
+        purchase.save(ignore_permissions=True)
+
+        purchase = frappe.get_doc(
+            "Sugar Purchase",
+            self.sugar_purchase
+        )
+
+        purchase.allocated_qty_quintal -= self.allocated_qty_quintal
+        purchase.save(ignore_permissions=True)
+        update_purchase_history(self.sugar_purchase)
 
     def calculate_values(self):
 

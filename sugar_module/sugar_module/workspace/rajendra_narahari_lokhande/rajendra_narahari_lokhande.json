@@ -66,6 +66,35 @@
   {
    "hidden": 0,
    "is_query_report": 0,
+   "label": "Payment",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Sugar Purchase",
+   "link_count": 0,
+   "link_to": "Sugar Purchase",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Sugar Payment",
+   "link_count": 0,
+   "link_to": "Purchase Payment",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
    "label": "Broker Section",
    "link_count": 4,
    "link_type": "DocType",
@@ -78,16 +107,6 @@
    "label": "Broker Details",
    "link_count": 0,
    "link_to": "Broker",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Broker Quantity",
-   "link_count": 0,
-   "link_to": "Broker Quantity",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -116,34 +135,15 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Payment",
-   "link_count": 2,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Sugar Purchase",
+   "label": "Dispatch Entry",
    "link_count": 0,
-   "link_to": "Sugar Purchase",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Sugar Payment",
-   "link_count": 0,
-   "link_to": "Purchase Payment",
+   "link_to": "Dispatch Entry",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
   }
  ],
- "modified": "2026-07-29 15:59:28.062858",
+ "modified": "2026-07-30 13:04:08.668433",
  "modified_by": "Administrator",
  "module": "Sugar Module",
  "name": "Rajendra Narahari Lokhande",

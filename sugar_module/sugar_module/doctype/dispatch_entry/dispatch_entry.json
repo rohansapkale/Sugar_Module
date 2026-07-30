@@ -9,7 +9,7 @@
   "section_break_xzdc",
   "basic_details_column",
   "amended_from",
-  "allocation",
+  "sugar_purchase",
   "company",
   "broker",
   "dispatch_date",
@@ -21,7 +21,6 @@
   "details_section",
   "item",
   "dispatch_qty_quintal",
-  "dispatch_qty_kg",
   "rate",
   "total_amount",
   "column_break_dguh",
@@ -48,13 +47,6 @@
    "fieldname": "basic_details_column",
    "fieldtype": "Column Break",
    "label": "Basic Details"
-  },
-  {
-   "fieldname": "allocation",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Allocation ",
-   "options": "Broker Quantity"
   },
   {
    "fetch_from": "allocation.broker",
@@ -98,12 +90,6 @@
    "fieldname": "dispatch_qty_quintal",
    "fieldtype": "Float",
    "label": "Dispatch Qty (Quintal)"
-  },
-  {
-   "fieldname": "dispatch_qty_kg",
-   "fieldtype": "Float",
-   "label": "Dispatch Qty (Kg)",
-   "read_only": 1
   },
   {
    "fieldname": "rate",
@@ -161,13 +147,19 @@
    "fieldtype": "Data",
    "label": "Title",
    "read_only": 1
+  },
+  {
+   "fieldname": "sugar_purchase",
+   "fieldtype": "Link",
+   "label": "Sugar Purchase",
+   "options": "Sugar Purchase"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-07-29 09:56:08.903828",
+ "modified": "2026-07-30 13:01:14.464399",
  "modified_by": "Administrator",
  "module": "Sugar Module",
  "name": "Dispatch Entry",
