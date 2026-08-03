@@ -10,7 +10,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": null,
- "modified": "2026-07-29 17:42:50.953695",
+ "modified": "2026-07-30 17:03:11.931715",
  "modified_by": "Administrator",
  "module": "Sugar Module",
  "name": "Sugar Daybook",
@@ -18,7 +18,7 @@
  "prepared_report": 0,
  "ref_doctype": "Sugar Purchase",
  "report_name": "Sugar Daybook",
- "report_type": "Query Report",
+ "report_type": "Script Report",
  "roles": [
   {
    "role": "System Manager"
