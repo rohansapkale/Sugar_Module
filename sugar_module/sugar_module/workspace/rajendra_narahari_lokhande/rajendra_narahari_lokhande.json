@@ -1,7 +1,7 @@
 {
  "app": "sugar_module",
  "charts": [],
- "content": "[{\"id\":\"_17U9R_Ctj\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Purchases Quantity Total (Qtl)\",\"col\":4}},{\"id\":\"Mda-86iL0x\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Dispatched Qty (qtl)\",\"col\":4}},{\"id\":\"nhV7FTxQnE\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Broker-Party Remaining Payment\",\"col\":4}},{\"id\":\"MeqLxBFian\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Supplier Remaining Payment\",\"col\":4}},{\"id\":\"QN5T5b5X8a\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"t3gQ0p2_Jk\",\"type\":\"card\",\"data\":{\"card_name\":\"Master\",\"col\":4}},{\"id\":\"hHW6BQebwy\",\"type\":\"card\",\"data\":{\"card_name\":\"Broker Section\",\"col\":4}},{\"id\":\"5-doUuM1U4\",\"type\":\"card\",\"data\":{\"card_name\":\"Payment\",\"col\":4}}]",
+ "content": "[{\"id\":\"_17U9R_Ctj\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Purchases Quantity Total (Qtl)\",\"col\":4}},{\"id\":\"Mda-86iL0x\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Dispatched Qty (qtl)\",\"col\":4}},{\"id\":\"nhV7FTxQnE\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Broker-Party Remaining Payment\",\"col\":4}},{\"id\":\"MeqLxBFian\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Supplier Remaining Payment\",\"col\":4}},{\"id\":\"QN5T5b5X8a\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"t3gQ0p2_Jk\",\"type\":\"card\",\"data\":{\"card_name\":\"Master\",\"col\":4}},{\"id\":\"hHW6BQebwy\",\"type\":\"card\",\"data\":{\"card_name\":\"Broker Section\",\"col\":4}},{\"id\":\"5-doUuM1U4\",\"type\":\"card\",\"data\":{\"card_name\":\"Payment\",\"col\":4}},{\"id\":\"SOl2T5bbpl\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
  "creation": "2026-07-23 10:12:24.729282",
  "custom_blocks": [],
  "docstatus": 0,
@@ -141,9 +141,60 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Reports",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Broker wise Sales",
+   "link_count": 0,
+   "link_to": "Broker Sales Register",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Sugar Purchase Report",
+   "link_count": 0,
+   "link_to": "Sugar Purchase Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "report_ref_doctype": "Sugar Purchase",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Sugar Payment Report",
+   "link_count": 0,
+   "link_to": "Sugar Payment Register",
+   "link_type": "Report",
+   "onboard": 0,
+   "report_ref_doctype": "Purchase Payment",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Supplier to customer report",
+   "link_count": 0,
+   "link_to": "Purchase Dispatch Traceability",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2026-07-30 13:04:08.668433",
+ "modified": "2026-08-03 12:11:44.516396",
  "modified_by": "Administrator",
  "module": "Sugar Module",
  "name": "Rajendra Narahari Lokhande",
