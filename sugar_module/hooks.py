@@ -38,7 +38,7 @@ website_route_rules = [
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/sugar_module/css/sugar_module.css"
-# app_include_js = "/assets/sugar_module/js/sugar_module.js"
+app_include_js = "/assets/sugar_module/sugar_desk_launcher.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/sugar_module/css/sugar_module.css"
