@@ -14,13 +14,13 @@
       <span class="user-name">👤 {{ userName }}</span>
       <span class="today-date">📅 {{ formattedDate }}</span>
       
-      <!-- Admin / ERPNext Desk Button -->
+      <!-- getMyErp Button -->
       <button
         class="admin-desk-btn"
-        title="Open ERPNext Admin Desk"
+        title="Go to ERPNext Desk (getMyErp)"
         @click="goToErpNext"
       >
-        <span class="admin-label">⚡ ERPNext Admin</span>
+        <span class="admin-label">⚡ getMyErp</span>
       </button>
 
       <!-- Dark / Light Mode Toggle Button -->
