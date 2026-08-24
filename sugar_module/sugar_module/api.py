@@ -79,11 +79,15 @@ def search_ledgers_and_parties(query=None, doctype=None, limit=50, **kwargs):
             fields = ["name", "account_name", "account_type"]
         elif doctype == "Sugar Purchase":
             if query:
+                or_filters["name"] = ["like", f"%{query}%"]
                 or_filters["supplier"] = ["like", f"%{query}%"]
+                or_filters["item"] = ["like", f"%{query}%"]
             fields = ["name", "supplier", "item", "purchase_qty_quintal", "purchase_rate", "total_amount", "available_qty_quintal"]
         elif doctype == "Dispatch Entry":
             if query:
+                or_filters["name"] = ["like", f"%{query}%"]
                 or_filters["customer_name"] = ["like", f"%{query}%"]
+                or_filters["broker"] = ["like", f"%{query}%"]
             fields = ["name", "customer_name", "broker", "vehicle_no", "total_amount", "balance_amount"]
         else:
             fields = ["name"]
@@ -98,21 +102,28 @@ def search_ledgers_and_parties(query=None, doctype=None, limit=50, **kwargs):
             ignore_permissions=True
         )
         for d in docs:
-            display_name = (
-                d.get("supplier_name") or
-                d.get("customer_name") or
-                d.get("broker_name") or
-                d.get("item_name") or
-                d.get("account_name") or
-                d.name
-            )
-            extra_type = d.get("city") or d.get("account_type") or doctype
+            if doctype == "Sugar Purchase":
+                display_name = f"{d.name} — {d.supplier} ({d.item})"
+                extra_type = f"Stock: {flt(d.available_qty_quintal)} Qtl"
+            elif doctype == "Dispatch Entry":
+                display_name = f"{d.name} — {d.customer_name}"
+                extra_type = f"Bal: ₹{flt(d.balance_amount)}"
+            else:
+                display_name = (
+                    d.get("supplier_name") or
+                    d.get("customer_name") or
+                    d.get("broker_name") or
+                    d.get("item_name") or
+                    d.get("account_name") or
+                    d.name
+                )
+                extra_type = d.get("city") or d.get("account_type") or doctype
             results.append({
                 "id": d.name,
                 "name": d.name,
                 "label": display_name,
                 "doctype": doctype,
-                "type": f"{doctype} ({extra_type})" if extra_type else doctype,
+                "type": extra_type if extra_type else doctype,
                 "details": d
             })
         return results

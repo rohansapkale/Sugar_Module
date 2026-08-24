@@ -155,6 +155,37 @@
 
       <!-- 2. DISPATCH ENTRY (F8) -->
       <div v-else-if="voucherType === 'dispatch'">
+        <!-- Sugar Purchase Lot Selector -->
+        <div class="field-row">
+          <label>Source Sugar Purchase</label>
+          <div class="input-control-wrap">
+            <input
+              ref="field_sugar_purchase"
+              v-model="form.sugar_purchase"
+              type="text"
+              placeholder="Select source Sugar Purchase lot (Mill / Voucher No)..."
+              autocomplete="off"
+              data-field="sugar_purchase"
+              @focus="onLedgerFocus('sugar_purchase', 'Sugar Purchase')"
+              @input="onLedgerInput('sugar_purchase', 'Sugar Purchase')"
+              @keydown="handleFieldKeyDown($event, 'sugar_purchase')"
+            />
+            <LedgerDropdown
+              v-if="activeDropdownField === 'sugar_purchase'"
+              :matches="dropdownMatches"
+              :active-index="dropdownIndex"
+              @select="selectDropdownMatch"
+              @hover="dropdownIndex = $event"
+            />
+          </div>
+        </div>
+
+        <!-- Selected Purchase Lot Live Stock Info Banner -->
+        <div v-if="selectedPurchaseLot" style="background: #edf3fd; border-left: 3px solid var(--blue); padding: 8px 12px; margin-bottom: 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
+          <span>🏭 Mill: <strong style="color: var(--navy);">{{ selectedPurchaseLot.supplier }}</strong> · Grade: <strong>{{ selectedPurchaseLot.item }}</strong> · Lot Qty: <strong>{{ selectedPurchaseLot.purchase_qty_quintal }} Qtl</strong></span>
+          <span>Stock Available: <strong style="color: var(--green); font-size: 13.5px;">{{ selectedPurchaseLot.available_qty_quintal }} Qtl</strong></span>
+        </div>
+
         <div class="field-grid">
           <div class="field-row">
             <label>Customer Party</label>
@@ -596,8 +627,11 @@ const VOUCHER_CONFIGS = {
 const currentConfig = computed(() => VOUCHER_CONFIGS[voucherType.value] || VOUCHER_CONFIGS.purchase)
 
 // Form State
+const selectedPurchaseLot = ref(null)
+
 const form = reactive({
   date: new Date().toISOString().split('T')[0],
+  sugar_purchase: '',
   supplier: '',
   customer: '',
   customer_name: '',
@@ -707,6 +741,10 @@ const selectDropdownMatch = (match) => {
     form.additional_rows[idx].ledger = match.name
   } else {
     form[fieldName] = match.name
+    if (fieldName === 'sugar_purchase' && match.details) {
+      selectedPurchaseLot.value = match.details
+      if (match.details.item) form.item = match.details.item
+    }
   }
 
   activeDropdownField.value = null
@@ -725,7 +763,7 @@ const getFieldSequence = () => {
   if (voucherType.value === 'purchase') {
     return ['date', 'supplier', 'item', 'qty', 'rate', 'narration']
   } else if (voucherType.value === 'dispatch') {
-    return ['date', 'customer_name', 'broker', 'vehicle_no', 'item', 'qty', 'rate', 'narration']
+    return ['date', 'sugar_purchase', 'customer_name', 'broker', 'vehicle_no', 'item', 'qty', 'rate', 'narration']
   } else if (voucherType.value === 'payment') {
     return ['date', 'bank_account', 'supplier', 'payment_mode', 'utr_no', 'paid_amount', 'narration']
   } else if (voucherType.value === 'receipt') {

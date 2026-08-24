@@ -21,11 +21,17 @@ export default defineConfig(({ command }) => {
     server: {
       port: 8080,
       host: '0.0.0.0',
+      watch: {
+        ignored: ['**/node_modules/**', '**/.git/**', '**/public/**', '**/.system_generated/**'],
+      },
       proxy: {
         '^/(api|app|login|logout|files)': {
           target: 'http://127.0.0.1:8001',
           changeOrigin: true,
           secure: false,
+          headers: {
+            'X-Frappe-Site-Name': 'sugar.local',
+          },
         },
       },
     },
