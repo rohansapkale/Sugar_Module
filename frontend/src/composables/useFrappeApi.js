@@ -14,6 +14,7 @@ export function useFrappeApi() {
   const isOnline = ref(true)
 
   const getCsrfToken = () => {
+    if (bootState.csrf_token) return bootState.csrf_token
     if (window.csrf_token) return window.csrf_token
     if (window.frappe_boot && window.frappe_boot.csrf_token) return window.frappe_boot.csrf_token
     const match = document.cookie.match(/csrf_token=([^;]+)/)
@@ -22,6 +23,9 @@ export function useFrappeApi() {
 
   const call = async (method, args = {}) => {
     try {
+      if (!bootState.isLoaded) {
+        await initBoot()
+      }
       const headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -31,10 +35,15 @@ export function useFrappeApi() {
         headers['X-Frappe-CSRF-Token'] = token
       }
 
+      const bodyObj = { ...args }
+      if (token) {
+        bodyObj.csrf_token = token
+      }
+
       const response = await fetch(`/api/method/${method}`, {
         method: 'POST',
         headers,
-        body: JSON.stringify(args),
+        body: JSON.stringify(bodyObj),
       })
 
       if (!response.ok) {
@@ -79,9 +88,13 @@ export function useFrappeApi() {
         const data = await res.json()
         const boot = data.message || data
         Object.assign(bootState, boot)
+        if (boot.csrf_token) {
+          window.csrf_token = boot.csrf_token
+        }
+        bootState.isLoaded = true
       }
     } catch (e) {
-      console.warn('[FrappeApi] Boot call failed, using defaults')
+      console.warn('[FrappeApi] Boot fetch fallback:', e)
     }
     bootState.isLoaded = true
     return bootState
