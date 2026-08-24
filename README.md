@@ -35,13 +35,47 @@
 | **`F5`** / **`Y`** | Purchase Payment | Open Supplier Payment voucher entry |
 | **`F6`** / **`R`** | Broker Receipt | Open Customer / Broker Receipt voucher entry |
 | **`F4`** | Contra Voucher | Open Bank / Cash Transfer entry |
-| **`L`** / **`Alt+L`** | Purchase Register | View list of all sugar purchases with stock |
-| **`K`** | Dispatch Register | View list of all dispatch entries |
-| **`B`** / **`F10`** | Day Book | Open unified Day Book & audit stream |
-| **`M`** | Masters Directory | Browse Suppliers, Customers, Brokers, and Items |
-| **`Alt+G`** | Go To Palette | Global command search popup |
-| **`Esc`** | Back / Gateway | Return to Gateway or dismiss modals |
-| **`Enter`** | Accept / Next | Advance field / accept voucher on narration |
+# 🌾 Sugar Module & Sugar Desk ERP
+
+An integrated Sugar Trading, Allocation & Accounting Module for Frappe v16, complete with a high-speed Tally-style keyboard desktop application (**Sugar Desk**).
+
+---
+
+## 🚀 Live Access
+
+- **Production URL**: `http://157.15.203.96:8001/sugar-desk`
+- **Vite Dev Server**: `http://157.15.203.96:8080`
+
+---
+
+## ⚡ Core Features & Vouchers
+
+1. **Sugar Purchase Entry (<kbd>F9</kbd> / <kbd>P</kbd>)**: Direct procurement lots from sugar mills with grade, quintals, and rate.
+2. **Dispatch Entry (<kbd>F8</kbd> / <kbd>D</kbd>)**: Sales dispatches with **Source Sugar Purchase Lot selector**, live available stock badges, and automatic inventory deduction.
+3. **Purchase Payment (<kbd>F5</kbd> / <kbd>Y</kbd>)**: Supplier RTGS/NEFT payments with **Source Purchase Lot auto-fill** and mill balance tracking.
+4. **Broker Party Payment (<kbd>F6</kbd> / <kbd>R</kbd>)**: Customer receipts with **Source Dispatch Entry auto-fill** and buyer balance tracking.
+5. **Contra Voucher (<kbd>F4</kbd>)**: Bank-to-bank and cash transfers.
+
+---
+
+## 📊 Registers & Financial Reports
+
+- **Broker Outstanding Receivables (<kbd>O</kbd>)**: Real-time pending dues from brokers and buyers grouped with itemised unpaid dispatch vouchers.
+- **Supplier Outstanding Payables (<kbd>S</kbd>)**: Real-time pending dues to sugar mills grouped with itemised unpaid purchase lots.
+- **Sugar Purchase Register (<kbd>L</kbd>)**: Complete list of purchases with remaining live stock.
+- **Dispatch Entry Register (<kbd>K</kbd>)**: Complete delivery register with balance due.
+- **Suppliers & Mills List (<kbd>U</kbd>)**: Full directory of sugar mills with total lots, total quintals, and stock.
+- **Brokers List (<kbd>B</kbd>)**: Broker directory with contact details and total dispatches.
+- **Customer Parties List (<kbd>C</kbd>)**: Registered buyer parties with group and territory.
+- **Day Book & Audit Register (<kbd>F10</kbd>)**: Unified transaction journal with debit/credit breakdown.
+
+---
+
+## ⌨️ Global Navigation & Themes
+
+- **`Alt+G` / `Ctrl+G` / `Ctrl+K`**: Tally "Go To" Command Palette.
+- **Dark Mode / Light Mode (🌙 / ☀️)**: Instant theme toggle with persistent storage.
+- **Single-Command Recovery**: `./fix_bench.sh --start` (or `./clean_bench.sh`) to unblock ports and start bench.
 
 ---
 
