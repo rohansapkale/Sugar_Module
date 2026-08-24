@@ -19,18 +19,19 @@ fixtures = [
 # Apps
 # ------------------
 
-# required_apps = []
+add_to_apps_screen = [
+	{
+		"name": "sugar_desk",
+		"logo": "/assets/sugar_module/logo.png",
+		"title": "Sugar Desk (Tally)",
+		"route": "/sugar-desk",
+	}
+]
 
-# Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "sugar_module",
-# 		"logo": "/assets/sugar_module/logo.png",
-# 		"title": "Sugar Module",
-# 		"route": "/sugar_module",
-# 		"has_permission": "sugar_module.api.permission.has_app_permission"
-# 	}
-# ]
+website_route_rules = [
+	{"from_route": "/sugar-desk/<path:app_path>", "to_route": "sugar_desk"},
+	{"from_route": "/sugar-desk", "to_route": "sugar_desk"},
+]
 
 # Includes in <head>
 # ------------------
