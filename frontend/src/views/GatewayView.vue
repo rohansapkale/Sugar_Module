@@ -20,7 +20,7 @@
           >
             <div style="font-size: 11px; color: var(--muted); text-transform: uppercase;">Sugar Purchases 📋</div>
             <div style="font-size: 20px; font-weight: 700; color: var(--navy); margin-top: 4px;">{{ stats.sugar_purchases_count }}</div>
-            <div style="font-size: 11px; color: var(--blue); margin-top: 2px;">Press <kbd>L</kbd> to view list</div>
+            <div style="font-size: 11px; color: var(--blue); margin-top: 2px;">Press <kbd>L</kbd> for list</div>
           </div>
           <div
             style="background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.15s ease;"
@@ -28,23 +28,23 @@
           >
             <div style="font-size: 11px; color: var(--muted); text-transform: uppercase;">Dispatches 📋</div>
             <div style="font-size: 20px; font-weight: 700; color: var(--blue); margin-top: 4px;">{{ stats.dispatches_count }}</div>
-            <div style="font-size: 11px; color: var(--blue); margin-top: 2px;">Press <kbd>K</kbd> to view list</div>
+            <div style="font-size: 11px; color: var(--blue); margin-top: 2px;">Press <kbd>K</kbd> for list</div>
           </div>
           <div
-            style="background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); cursor: pointer;"
-            @click="router.push('/masters')"
+            style="background: #fff8f8; border: 1px solid #fecaca; border-radius: 6px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.15s ease;"
+            @click="router.push('/register/broker-outstanding')"
           >
-            <div style="font-size: 11px; color: var(--muted); text-transform: uppercase;">Sugar Mills / Suppliers</div>
-            <div style="font-size: 20px; font-weight: 700; color: var(--green); margin-top: 4px;">{{ stats.suppliers_count }}</div>
-            <div style="font-size: 11px; color: var(--green); margin-top: 2px;">Press <kbd>M</kbd> for masters</div>
+            <div style="font-size: 11px; color: var(--red); text-transform: uppercase; font-weight: 700;">Broker Receivables ⚠️</div>
+            <div style="font-size: 15px; font-weight: 700; color: var(--red); margin-top: 4px;">Pending Dues</div>
+            <div style="font-size: 11px; color: var(--red); margin-top: 2px;">Press <kbd>O</kbd> for report</div>
           </div>
           <div
-            style="background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); cursor: pointer;"
-            @click="router.push('/masters')"
+            style="background: #fefce8; border: 1px solid #fde047; border-radius: 6px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.15s ease;"
+            @click="router.push('/register/supplier-outstanding')"
           >
-            <div style="font-size: 11px; color: var(--muted); text-transform: uppercase;">Brokers</div>
-            <div style="font-size: 20px; font-weight: 700; color: var(--amber); margin-top: 4px;">{{ stats.brokers_count }}</div>
-            <div style="font-size: 11px; color: var(--amber); margin-top: 2px;">Press <kbd>M</kbd> for brokers</div>
+            <div style="font-size: 11px; color: var(--amber); text-transform: uppercase; font-weight: 700;">Supplier Payables 🏭</div>
+            <div style="font-size: 15px; font-weight: 700; color: var(--amber); margin-top: 4px;">Pending Dues</div>
+            <div style="font-size: 11px; color: var(--amber); margin-top: 2px;">Press <kbd>S</kbd> for report</div>
           </div>
         </div>
 
@@ -124,6 +124,8 @@ const menuItems = [
   { key: 'D', label: 'Dispatch Entry (F8)', action: () => router.push('/voucher/dispatch') },
   { key: 'Y', label: 'Purchase Payment (F5)', action: () => router.push('/voucher/payment') },
   { key: 'R', label: 'Broker Receipt (F6)', action: () => router.push('/voucher/receipt') },
+  { key: 'O', label: 'Broker Receivables (Outstanding)', action: () => router.push('/register/broker-outstanding') },
+  { key: 'S', label: 'Supplier Payables (Outstanding)', action: () => router.push('/register/supplier-outstanding') },
   { key: 'L', label: 'Sugar Purchase List (Register)', action: () => router.push('/register/purchase') },
   { key: 'K', label: 'Dispatch Entry List (Register)', action: () => router.push('/register/dispatch') },
   { key: 'B', label: 'Day Book & Audit (F10)', action: () => router.push('/daybook') },

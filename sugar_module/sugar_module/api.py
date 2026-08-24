@@ -561,6 +561,136 @@ def get_register_data(voucher_type=None, query=None, limit=100, **kwargs):
             }
         }
 
+    elif voucher_type in ("broker-outstanding", "receivables", "broker_receivables"):
+        # Fetch all dispatch entries
+        dispatches = frappe.get_all(
+            "Dispatch Entry",
+            filters={"docstatus": ["!=", 2]},
+            fields=[
+                "name", "dispatch_date", "customer_name", "broker", "vehicle_no",
+                "item", "dispatch_qty_quintal", "rate", "total_amount", "paid_amount",
+                "balance_amount", "payment_status", "status", "sugar_purchase"
+            ],
+            limit=limit * 2,
+            order_by="creation desc",
+            ignore_permissions=True
+        )
+
+        broker_map = {}
+        for d in dispatches:
+            b_key = d.broker or "Direct / No Broker"
+            if b_key not in broker_map:
+                broker_name = frappe.db.get_value("Broker", b_key, "broker_name") or b_key
+                broker_mobile = frappe.db.get_value("Broker", b_key, "mobile_no") or ""
+                broker_map[b_key] = {
+                    "broker_id": b_key,
+                    "broker_name": broker_name,
+                    "broker_mobile": broker_mobile,
+                    "total_dispatches": 0,
+                    "total_qty": 0.0,
+                    "total_billed": 0.0,
+                    "total_received": 0.0,
+                    "total_pending": 0.0,
+                    "pending_vouchers": [],
+                }
+            bm = broker_map[b_key]
+            bm["total_dispatches"] += 1
+            bm["total_qty"] += flt(d.dispatch_qty_quintal)
+            bm["total_billed"] += flt(d.total_amount)
+            bm["total_received"] += flt(d.paid_amount)
+            bm["total_pending"] += flt(d.balance_amount)
+            
+            d["broker_name"] = bm["broker_name"]
+            if flt(d.balance_amount) > 0 or d.payment_status != "Paid":
+                bm["pending_vouchers"].append(d)
+
+        broker_list = sorted(list(broker_map.values()), key=lambda x: x["total_pending"], reverse=True)
+        if query:
+            broker_list = [b for b in broker_list if query.lower() in b["broker_name"].lower() or query.lower() in b["broker_id"].lower()]
+
+        total_outstanding = sum(b["total_pending"] for b in broker_list)
+        total_billed = sum(b["total_billed"] for b in broker_list)
+        total_received = sum(b["total_received"] for b in broker_list)
+
+        return {
+            "voucher_type": "broker-outstanding",
+            "title": "Broker / Customer Outstanding Receivables Report",
+            "records": dispatches,
+            "groups": broker_list,
+            "summary": {
+                "total_outstanding": total_outstanding,
+                "total_billed": total_billed,
+                "total_received": total_received,
+                "total_brokers": len(broker_list),
+                "total_pending_vouchers": sum(len(b["pending_vouchers"]) for b in broker_list),
+            }
+        }
+
+    elif voucher_type in ("supplier-outstanding", "payables", "supplier_payables"):
+        # Fetch all sugar purchases
+        purchases = frappe.get_all(
+            "Sugar Purchase",
+            filters={"docstatus": ["!=", 2]},
+            fields=[
+                "name", "purchase_date", "supplier", "item", "purchase_qty_quintal",
+                "purchase_rate", "total_amount", "paid_amount", "remaining_amount",
+                "payment_status", "dispatched_qty_quintal", "available_qty_quintal",
+                "status", "docstatus"
+            ],
+            limit=limit * 2,
+            order_by="creation desc",
+            ignore_permissions=True
+        )
+
+        supplier_map = {}
+        for p in purchases:
+            s_key = p.supplier or "Unknown Mill"
+            if s_key not in supplier_map:
+                supplier_name = frappe.db.get_value("Supplier", s_key, "supplier_name") or s_key
+                supplier_map[s_key] = {
+                    "supplier_id": s_key,
+                    "supplier_name": supplier_name,
+                    "total_purchases": 0,
+                    "total_qty": 0.0,
+                    "total_billed": 0.0,
+                    "total_paid": 0.0,
+                    "total_pending": 0.0,
+                    "pending_vouchers": [],
+                }
+            sm = supplier_map[s_key]
+            sm["total_purchases"] += 1
+            sm["total_qty"] += flt(p.purchase_qty_quintal)
+            sm["total_billed"] += flt(p.total_amount)
+            sm["total_paid"] += flt(p.paid_amount)
+            rem = flt(p.remaining_amount) if p.remaining_amount is not None and flt(p.remaining_amount) > 0 else (flt(p.total_amount) - flt(p.paid_amount))
+            sm["total_pending"] += rem
+            
+            p["remaining_amount"] = rem
+            if rem > 0 or p.payment_status != "Paid":
+                sm["pending_vouchers"].append(p)
+
+        supplier_list = sorted(list(supplier_map.values()), key=lambda x: x["total_pending"], reverse=True)
+        if query:
+            supplier_list = [s for s in supplier_list if query.lower() in s["supplier_name"].lower() or query.lower() in s["supplier_id"].lower()]
+
+        total_outstanding = sum(s["total_pending"] for s in supplier_list)
+        total_billed = sum(s["total_billed"] for s in supplier_list)
+        total_paid = sum(s["total_paid"] for s in supplier_list)
+
+        return {
+            "voucher_type": "supplier-outstanding",
+            "title": "Supplier / Mill Outstanding Payables Report",
+            "records": purchases,
+            "groups": supplier_list,
+            "summary": {
+                "total_outstanding": total_outstanding,
+                "total_billed": total_billed,
+                "total_paid": total_paid,
+                "total_suppliers": len(supplier_list),
+                "total_pending_vouchers": sum(len(s["pending_vouchers"]) for s in supplier_list),
+            }
+        }
+
     return {"records": [], "summary": {}}
 
 
