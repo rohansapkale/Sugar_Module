@@ -691,6 +691,111 @@ def get_register_data(voucher_type=None, query=None, limit=100, **kwargs):
             }
         }
 
+    elif voucher_type in ("Supplier", "supplier"):
+        or_filters = {}
+        if query:
+            or_filters["name"] = ["like", f"%{query}%"]
+            or_filters["supplier_name"] = ["like", f"%{query}%"]
+
+        records = frappe.get_all(
+            "Supplier",
+            or_filters=or_filters if query else None,
+            fields=["name", "supplier_name", "supplier_group", "supplier_type", "country"],
+            limit=limit,
+            order_by="creation desc",
+            ignore_permissions=True
+        )
+
+        for s in records:
+            # Count purchases for this supplier
+            purchases = frappe.get_all(
+                "Sugar Purchase",
+                filters={"supplier": s.name, "docstatus": ["!=", 2]},
+                fields=["purchase_qty_quintal", "total_amount", "available_qty_quintal"],
+                ignore_permissions=True
+            )
+            s["total_lots"] = len(purchases)
+            s["total_qty"] = sum(flt(p.purchase_qty_quintal) for p in purchases)
+            s["total_amount"] = sum(flt(p.total_amount) for p in purchases)
+            s["available_stock"] = sum(flt(p.available_qty_quintal) for p in purchases)
+
+        return {
+            "voucher_type": "Supplier",
+            "title": "Suppliers & Sugar Mills Register",
+            "records": records,
+            "summary": {
+                "total_count": len(records),
+                "total_qty": sum(flt(r.get("total_qty", 0)) for r in records),
+                "total_amount": sum(flt(r.get("total_amount", 0)) for r in records),
+                "total_available_qty": sum(flt(r.get("available_stock", 0)) for r in records),
+            }
+        }
+
+    elif voucher_type in ("Broker", "broker"):
+        or_filters = {}
+        if query:
+            or_filters["name"] = ["like", f"%{query}%"]
+            or_filters["broker_name"] = ["like", f"%{query}%"]
+            or_filters["city"] = ["like", f"%{query}%"]
+
+        records = frappe.get_all(
+            "Broker",
+            or_filters=or_filters if query else None,
+            fields=["name", "broker_name", "mobile_no", "city", "state"],
+            limit=limit,
+            order_by="creation desc",
+            ignore_permissions=True
+        )
+
+        for b in records:
+            # Count dispatches for this broker
+            dispatches = frappe.get_all(
+                "Dispatch Entry",
+                filters={"broker": b.name, "docstatus": ["!=", 2]},
+                fields=["dispatch_qty_quintal", "total_amount", "balance_amount"],
+                ignore_permissions=True
+            )
+            b["total_dispatches"] = len(dispatches)
+            b["total_qty"] = sum(flt(d.dispatch_qty_quintal) for d in dispatches)
+            b["total_amount"] = sum(flt(d.total_amount) for d in dispatches)
+            b["total_balance"] = sum(flt(d.balance_amount) for d in dispatches)
+
+        return {
+            "voucher_type": "Broker",
+            "title": "Sugar Brokers Register",
+            "records": records,
+            "summary": {
+                "total_count": len(records),
+                "total_qty": sum(flt(r.get("total_qty", 0)) for r in records),
+                "total_amount": sum(flt(r.get("total_amount", 0)) for r in records),
+                "total_balance": sum(flt(r.get("total_balance", 0)) for r in records),
+            }
+        }
+
+    elif voucher_type in ("Customer", "customer"):
+        or_filters = {}
+        if query:
+            or_filters["name"] = ["like", f"%{query}%"]
+            or_filters["customer_name"] = ["like", f"%{query}%"]
+
+        records = frappe.get_all(
+            "Customer",
+            or_filters=or_filters if query else None,
+            fields=["name", "customer_name", "customer_group", "territory", "customer_type"],
+            limit=limit,
+            order_by="creation desc",
+            ignore_permissions=True
+        )
+
+        return {
+            "voucher_type": "Customer",
+            "title": "Customer Parties Register",
+            "records": records,
+            "summary": {
+                "total_count": len(records),
+            }
+        }
+
     return {"records": [], "summary": {}}
 
 
