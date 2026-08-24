@@ -221,6 +221,45 @@ def search_ledgers_and_parties(query=None, doctype=None, limit=50, **kwargs):
     return results
 
 
+def resolve_link(doctype, value, name_field=None):
+    """
+    Safely resolves a document ID if the user typed or passed a human label/name.
+    """
+    if not value:
+        return None
+    value = str(value).strip()
+    # Check if value is directly the document name
+    if frappe.db.exists(doctype, value):
+        return value
+    
+    # Try searching by common name fields
+    search_fields = [name_field] if name_field else []
+    if doctype == "Broker":
+        search_fields += ["broker_name"]
+    elif doctype == "Customer":
+        search_fields += ["customer_name"]
+    elif doctype == "Supplier":
+        search_fields += ["supplier_name"]
+    elif doctype == "Item":
+        search_fields += ["item_name"]
+    elif doctype == "Sugar Purchase":
+        sp = frappe.db.get_value("Sugar Purchase", {"name": value}) or frappe.db.get_value("Sugar Purchase", {"supplier": value})
+        if sp:
+            return sp
+
+    for sf in search_fields:
+        if not sf:
+            continue
+        res = frappe.db.get_value(doctype, {sf: value}, "name")
+        if res:
+            return res
+        res = frappe.db.get_value(doctype, {sf: ["like", f"%{value}%"]}, "name")
+        if res:
+            return res
+            
+    return value
+
+
 @frappe.whitelist(methods=["POST"], allow_guest=True)
 def save_sugar_voucher(voucher_type, payload, submit=0):
     """
@@ -232,11 +271,14 @@ def save_sugar_voucher(voucher_type, payload, submit=0):
     submit = int(submit)
 
     if voucher_type == "Sugar Purchase":
+        supplier = resolve_link("Supplier", payload.get("supplier"), "supplier_name") or payload.get("supplier")
+        item = resolve_link("Item", payload.get("item"), "item_name") or "S-302526"
+
         doc = frappe.new_doc("Sugar Purchase")
-        doc.supplier = payload.get("supplier")
+        doc.supplier = supplier
         doc.company = payload.get("company") or frappe.defaults.get_user_default("company") or "Rajendra Narahari Lokhande"
         doc.purchase_date = payload.get("purchase_date") or nowdate()
-        doc.item = payload.get("item") or "S-302526"
+        doc.item = item
         doc.purchase_qty_quintal = flt(payload.get("purchase_qty_quintal"))
         doc.purchase_rate = flt(payload.get("purchase_rate"))
         doc.total_amount = doc.purchase_qty_quintal * doc.purchase_rate
@@ -254,14 +296,27 @@ def save_sugar_voucher(voucher_type, payload, submit=0):
         }
 
     elif voucher_type == "Dispatch Entry":
+        sugar_purchase = resolve_link("Sugar Purchase", payload.get("sugar_purchase"))
+        # If sugar purchase is not provided, pick the latest active sugar purchase as fallback
+        if not sugar_purchase or not frappe.db.exists("Sugar Purchase", sugar_purchase):
+            latest_sp = frappe.get_all("Sugar Purchase", order_by="creation desc", limit=1, ignore_permissions=True)
+            if latest_sp:
+                sugar_purchase = latest_sp[0].name
+            else:
+                frappe.throw(_("Please select a valid Source Sugar Purchase lot."))
+
+        broker = resolve_link("Broker", payload.get("broker"), "broker_name")
+        customer_name = resolve_link("Customer", payload.get("customer_name"), "customer_name") or payload.get("customer_name")
+        item = resolve_link("Item", payload.get("item"), "item_name") or "S-302526"
+
         doc = frappe.new_doc("Dispatch Entry")
-        doc.sugar_purchase = payload.get("sugar_purchase")
+        doc.sugar_purchase = sugar_purchase
         doc.company = payload.get("company") or frappe.defaults.get_user_default("company") or "Rajendra Narahari Lokhande"
-        doc.broker = payload.get("broker")
-        doc.customer_name = payload.get("customer_name")
+        doc.broker = broker
+        doc.customer_name = customer_name
         doc.vehicle_no = payload.get("vehicle_no")
         doc.dispatch_date = payload.get("dispatch_date") or nowdate()
-        doc.item = payload.get("item") or "S-302526"
+        doc.item = item
         doc.dispatch_qty_quintal = flt(payload.get("dispatch_qty_quintal"))
         doc.rate = flt(payload.get("rate"))
         doc.total_amount = doc.dispatch_qty_quintal * doc.rate
@@ -282,9 +337,12 @@ def save_sugar_voucher(voucher_type, payload, submit=0):
         }
 
     elif voucher_type == "Purchase Payment":
+        supplier = resolve_link("Supplier", payload.get("supplier"), "supplier_name") or payload.get("supplier")
+        sugar_purchase = resolve_link("Sugar Purchase", payload.get("sugar_purchase"))
+
         doc = frappe.new_doc("Purchase Payment")
-        doc.supplier = payload.get("supplier")
-        doc.sugar_purchase = payload.get("sugar_purchase")
+        doc.supplier = supplier
+        doc.sugar_purchase = sugar_purchase
         doc.payment_date = payload.get("payment_date") or nowdate()
         doc.payment_mode = payload.get("payment_mode") or "NEFT"
         doc.reference_no = payload.get("reference_no")
@@ -306,10 +364,14 @@ def save_sugar_voucher(voucher_type, payload, submit=0):
         }
 
     elif voucher_type == "Broker Party Payment":
+        broker = resolve_link("Broker", payload.get("broker"), "broker_name")
+        customer = resolve_link("Customer", payload.get("customer"), "customer_name") or payload.get("customer")
+        dispatch_entry = resolve_link("Dispatch Entry", payload.get("dispatch_entry"))
+
         doc = frappe.new_doc("Broker Party Payment")
-        doc.dispatch_entry = payload.get("dispatch_entry")
-        doc.broker = payload.get("broker")
-        doc.customer = payload.get("customer")
+        doc.dispatch_entry = dispatch_entry
+        doc.broker = broker
+        doc.customer = customer
         doc.payment_date = payload.get("payment_date") or nowdate()
         doc.payment_mode = payload.get("payment_mode") or "NEFT"
         doc.utr_no = payload.get("utr_no")

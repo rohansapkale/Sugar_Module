@@ -38,7 +38,24 @@ export function useFrappeApi() {
       })
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        let errMsg = `Server error (${response.status})`
+        try {
+          const errData = await response.json()
+          if (errData._server_messages) {
+            const msgs = JSON.parse(errData._server_messages)
+            if (Array.isArray(msgs) && msgs.length) {
+              const parsed = typeof msgs[0] === 'string' ? JSON.parse(msgs[0]) : msgs[0]
+              if (parsed.message) {
+                errMsg = parsed.message.replace(/<[^>]*>/g, '').trim()
+              }
+            }
+          } else if (errData.exception) {
+            errMsg = errData.exception.split(':').pop().trim()
+          } else if (errData.message) {
+            errMsg = errData.message
+          }
+        } catch (_) {}
+        throw new Error(errMsg)
       }
 
       const data = await response.json()
