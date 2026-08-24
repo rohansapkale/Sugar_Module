@@ -10,6 +10,7 @@
   --line-dark: #b8c4d9;
   --bg: #f3f5f9;
   --panel: #ffffff;
+  --panel-soft: #f8fafc;
   --text: #1c2333;
   --muted: #6b7488;
   --amber: #c07a11;
@@ -18,6 +19,139 @@
   --green-soft: #e8f7ee;
   --red: #c0392b;
   --red-soft: #fdeeee;
+  --body-bg: #dde2ee;
+  --input-bg: #ffffff;
+  --input-border: #c7cfe0;
+  --table-hover: #f2f6fc;
+}
+
+body.dark-mode {
+  --navy: #0e1726;
+  --navy-deep: #060b14;
+  --navy-light: #172338;
+  --blue: #3b82f6;
+  --blue-hover: #60a5fa;
+  --blue-soft: #1e293b;
+  --blue-select: #2563eb;
+  --line: #223049;
+  --line-dark: #324466;
+  --bg: #0b1120;
+  --panel: #111a2e;
+  --panel-soft: #16223b;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --amber: #f59e0b;
+  --amber-light: #2d2415;
+  --green: #10b981;
+  --green-soft: #064e3b;
+  --red: #ef4444;
+  --red-soft: #450a0a;
+  --body-bg: #050811;
+  --input-bg: #16223b;
+  --input-border: #2c3e60;
+  --table-hover: #17243d;
+  color: #f1f5f9;
+  background: var(--body-bg);
+}
+
+body.dark-mode #app {
+  border-color: #223049;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+}
+
+body.dark-mode .daybook-table th,
+body.dark-mode table.grid th {
+  background: #0f192c;
+  color: #e2e8f0;
+}
+
+body.dark-mode .field-row input,
+body.dark-mode .field-row select,
+body.dark-mode .field-row textarea,
+body.dark-mode .input-control-wrap input,
+body.dark-mode .input-control-wrap select,
+body.dark-mode .input-control-wrap textarea,
+body.dark-mode table.grid td input {
+  background: #16223b;
+  border-color: #2c3e60;
+  color: #f1f5f9;
+}
+
+body.dark-mode .field-row input:focus,
+body.dark-mode .field-row select:focus,
+body.dark-mode .field-row textarea:focus,
+body.dark-mode .input-control-wrap input:focus,
+body.dark-mode .input-control-wrap select:focus,
+body.dark-mode .input-control-wrap textarea:focus,
+body.dark-mode td input:focus {
+  background: #1b2a47 !important;
+  border-color: var(--blue) !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .dropdown-menu-list {
+  background: #111a2e;
+  border-color: #3b82f6;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode .dropdown-menu-list .item {
+  color: #f1f5f9;
+  border-bottom-color: #1e293b;
+}
+
+body.dark-mode .dropdown-menu-list .item.hi {
+  background: #2563eb;
+  color: #fff;
+}
+
+body.dark-mode .goto-box {
+  background: #111a2e;
+  border-color: #26334d;
+}
+
+body.dark-mode .goto-box input {
+  background: #16223b;
+  color: #f1f5f9;
+  border-bottom-color: #26334d;
+}
+
+body.dark-mode .goto-list div {
+  color: #f1f5f9;
+  border-bottom-color: #1a253c;
+}
+
+body.dark-mode .goto-list div.hi {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+body.dark-mode .daybook-row:hover {
+  background: var(--table-hover);
+}
+
+body.dark-mode .menu-item:hover {
+  background: #16223b;
+}
+
+body.dark-mode .menu-item.active {
+  background: #1e293b;
+  color: #93c5fd;
+}
+
+body.dark-mode .fk:hover {
+  background: #1e293b;
+  color: #93c5fd;
+}
+
+body.dark-mode .modal-box {
+  background: #111a2e;
+  border-color: #26334d;
+}
+
+body.dark-mode .modal-box .m-foot {
+  background: #0f172a;
+  border-top-color: #26334d;
 }
 
 * {
@@ -34,12 +168,13 @@ html, body {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  background: #dde2ee;
+  background: var(--body-bg);
   color: var(--text);
   display: flex;
   align-items: center;
   justify-content: center;
   user-select: none;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 #app {
@@ -58,7 +193,7 @@ body {
   #app {
     max-width: 1280px;
     height: 92vh;
-    border: 1px solid #c3cadd;
+    border: 1px solid var(--line-dark);
     border-radius: 8px;
     box-shadow: 0 12px 40px rgba(20, 25, 60, 0.22);
   }
@@ -94,7 +229,7 @@ body {
 #topbar .meta {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   font-size: 12.5px;
   color: #c7d5f0;
 }
@@ -282,6 +417,10 @@ body {
   color: var(--navy);
 }
 
+body.dark-mode .v-title {
+  color: #93c5fd;
+}
+
 .field-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -314,12 +453,12 @@ body {
   width: 100%;
   flex: 1;
   padding: 8px 10px;
-  border: 1px solid #c7cfe0;
+  border: 1px solid var(--input-border);
   border-radius: 4px;
   font-size: 13.5px;
   font-family: inherit;
   outline: none;
-  background: var(--panel);
+  background: var(--input-bg);
   color: var(--text);
   transition: border 0.15s ease, box-shadow 0.15s ease;
 }
@@ -329,7 +468,6 @@ body {
 td input:focus {
   border-color: var(--blue) !important;
   box-shadow: 0 0 0 2px var(--blue-soft) !important;
-  background: #ffffff !important;
 }
 
 .field-row.disabled input,
@@ -337,6 +475,12 @@ td input:focus {
   background: #edf0f6;
   color: #7b8398;
   cursor: not-allowed;
+}
+
+body.dark-mode .field-row.disabled input,
+body.dark-mode .input-control-wrap input[readonly] {
+  background: #111a2e;
+  color: #64748b;
 }
 
 /* Grids / Tables */
@@ -399,6 +543,11 @@ table.grid tr.total td {
   padding: 8px 11px;
 }
 
+body.dark-mode table.grid tr.total td {
+  background: #16223b;
+  color: #93c5fd;
+}
+
 .cell-wrap {
   position: relative;
 }
@@ -427,7 +576,7 @@ table.grid tr.total td {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #f0f3f8;
+  border-bottom: 1px solid var(--line);
 }
 
 .dropdown-menu-list .item:last-child {
@@ -467,6 +616,12 @@ table.grid tr.total td {
   font-weight: 600;
   font-size: 11px;
   color: var(--navy);
+}
+
+body.dark-mode .keyboard-hint kbd {
+  background: #1e293b;
+  border-color: #334155;
+  color: #93c5fd;
 }
 
 /* Toast */
@@ -572,7 +727,7 @@ table.grid tr.total td {
 }
 
 .daybook-row:hover {
-  background: #f2f6fc;
+  background: var(--table-hover);
 }
 
 .daybook-row.hi {
@@ -619,7 +774,8 @@ table.grid tr.total td {
   font-size: 15px;
   outline: none;
   font-family: inherit;
-  background: #ffffff;
+  background: var(--panel);
+  color: var(--text);
 }
 
 .goto-list {
@@ -634,7 +790,8 @@ table.grid tr.total td {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #f6f8fc;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
 }
 
 .goto-list div.hi {

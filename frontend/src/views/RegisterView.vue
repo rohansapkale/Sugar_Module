@@ -12,7 +12,7 @@
             v-model="searchQuery"
             type="text"
             placeholder="Search party, broker, voucher..."
-            style="width: 240px; padding: 6px 10px; font-size: 13px; border: 1px solid var(--blue); border-radius: 4px; outline: none; background: #fff;"
+            style="width: 240px; padding: 6px 10px; font-size: 13px; border: 1px solid var(--blue); border-radius: 4px; outline: none; background: var(--input-bg); color: var(--text);"
             @input="filterDebounce"
           />
           <button
@@ -59,7 +59,7 @@
 
       <!-- KPI Summary Cards for Outstanding Reports -->
       <div v-else-if="summary && ['broker-outstanding', 'supplier-outstanding'].includes(registerType)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px;">
-        <div class="summary-card" style="border-left: 4px solid var(--red); background: #fff8f8;">
+        <div class="summary-card" style="border-left: 4px solid var(--red);">
           <div class="sc-label" style="color: var(--red);">Total Outstanding Due</div>
           <div class="sc-val" style="color: var(--red); font-size: 20px;">₹{{ formatCurrency(summary.total_outstanding) }}</div>
         </div>
@@ -300,7 +300,7 @@
       <div v-else-if="registerType === 'broker-outstanding' && groups.length">
         <div v-for="(g, gIdx) in groups" :key="g.broker_id || gIdx" style="background: var(--panel); border: 1px solid var(--line); border-radius: 6px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
           <!-- Broker Group Header -->
-          <div style="background: #f8fafc; padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <div style="background: var(--panel-soft); padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
             <div>
               <span style="font-size: 15px; font-weight: 700; color: var(--navy);">🤝 Broker: {{ g.broker_name }}</span>
               <span v-if="g.broker_mobile" style="font-size: 12px; color: var(--muted); margin-left: 10px;">📞 {{ g.broker_mobile }}</span>
@@ -318,7 +318,7 @@
           <!-- Pending Vouchers Table inside Group -->
           <table v-if="g.pending_vouchers && g.pending_vouchers.length" class="daybook-table" style="margin: 0;">
             <thead>
-              <tr style="background: #fff;">
+              <tr style="background: var(--panel);">
                 <th style="width: 16%;">Dispatch No.</th>
                 <th style="width: 11%;">Date</th>
                 <th style="width: 25%;">Customer (Buyer)</th>
@@ -350,7 +350,7 @@
       <div v-else-if="registerType === 'supplier-outstanding' && groups.length">
         <div v-for="(g, gIdx) in groups" :key="g.supplier_id || gIdx" style="background: var(--panel); border: 1px solid var(--line); border-radius: 6px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
           <!-- Supplier Group Header -->
-          <div style="background: #f8fafc; padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <div style="background: var(--panel-soft); padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
             <div>
               <span style="font-size: 15px; font-weight: 700; color: var(--navy);">🏭 Mill / Supplier: {{ g.supplier_name }}</span>
               <span style="font-size: 12px; color: var(--muted); margin-left: 10px;">({{ g.total_purchases }} Lots · {{ formatNumber(g.total_qty) }} Qtl)</span>
@@ -367,7 +367,7 @@
           <!-- Pending Vouchers Table inside Group -->
           <table v-if="g.pending_vouchers && g.pending_vouchers.length" class="daybook-table" style="margin: 0;">
             <thead>
-              <tr style="background: #fff;">
+              <tr style="background: var(--panel);">
                 <th style="width: 20%;">Purchase Lot ID</th>
                 <th style="width: 11%;">Date</th>
                 <th style="width: 10%;">Grade</th>

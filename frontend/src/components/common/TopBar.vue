@@ -13,6 +13,17 @@
     <div class="meta">
       <span class="user-name">👤 {{ userName }}</span>
       <span class="today-date">📅 {{ formattedDate }}</span>
+      
+      <!-- Dark / Light Mode Toggle Button -->
+      <button
+        class="theme-toggle-btn"
+        :title="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+        @click="toggleTheme"
+      >
+        <span v-if="isDarkMode" class="theme-label">☀️ Light</span>
+        <span v-else class="theme-label">🌙 Dark</span>
+      </button>
+
       <span class="goto-hint" @click="openGoTo">
         <b>Alt+G</b> Go To
       </span>
@@ -24,8 +35,10 @@
 import { computed } from 'vue'
 import { useFrappeApi } from '../../composables/useFrappeApi'
 import { globalUiState } from '../../composables/useKeyboardEngine'
+import { useTheme } from '../../composables/useTheme'
 
 const { bootState } = useFrappeApi()
+const { isDarkMode, toggleTheme } = useTheme()
 
 const companyName = computed(() => {
   return bootState.default_company || 'Mahalaxmi Sugar Mills Pvt. Ltd.'
@@ -44,3 +57,33 @@ const openGoTo = () => {
   globalUiState.isGoToOpen.value = true
 }
 </script>
+
+<style scoped>
+.theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
+}
+
+.theme-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+</style>
