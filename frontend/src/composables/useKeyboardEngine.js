@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import { router } from '../router'
 
 export const VOUCHER_TYPE_MAP = {
@@ -124,6 +124,18 @@ function initGlobalKeyboardListener() {
     if (e.key.startsWith('F') && /^F([1-9]|1[0-2])$/.test(e.key)) {
       e.preventDefault()
       handleFunctionKey(e.key)
+      return
+    }
+
+    // 6. Global Escape Navigation Handler (returns to Gateway from any report, register, master or voucher)
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      if (document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+        document.activeElement.blur()
+      }
+      if (router && router.currentRoute.value.path !== '/') {
+        router.push('/')
+      }
       return
     }
   }, { capture: true })

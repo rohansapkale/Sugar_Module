@@ -175,6 +175,9 @@ const handleKeyDown = (e) => {
     if (entries.value[activeRowIndex.value]) {
       openVoucher(entries.value[activeRowIndex.value])
     }
+  } else if (e.key === 'Escape') {
+    e.preventDefault()
+    router.push('/')
   }
 }
 

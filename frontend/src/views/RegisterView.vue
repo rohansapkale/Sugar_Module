@@ -614,6 +614,9 @@ const handleKeyDown = (e) => {
   } else if (e.key.toLowerCase() === 'n') {
     e.preventDefault()
     openNewEntry()
+  } else if (e.key === 'Escape') {
+    e.preventDefault()
+    router.push('/')
   }
 }
 

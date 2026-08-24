@@ -77,7 +77,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useFrappeApi } from '../composables/useFrappeApi'
 import MenuPanel from '../components/common/MenuPanel.vue'
@@ -130,7 +130,19 @@ const handleMenuSelect = (idx) => {
   mastersMenuItems[idx].action()
 }
 
+const handleKeyDown = (e) => {
+  if (e.key === 'Escape') {
+    e.preventDefault()
+    router.push('/')
+  }
+}
+
 onMounted(() => {
   setTab('Supplier')
+  window.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
 })
 </script>
