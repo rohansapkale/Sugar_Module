@@ -313,6 +313,37 @@
 
       <!-- 3. PURCHASE PAYMENT (F5) -->
       <div v-else-if="voucherType === 'payment'">
+        <!-- Sugar Purchase Lot Selector for Payment -->
+        <div class="field-row">
+          <label>Source Sugar Purchase</label>
+          <div class="input-control-wrap">
+            <input
+              ref="field_sugar_purchase"
+              v-model="form.sugar_purchase"
+              type="text"
+              placeholder="Select Sugar Purchase lot (Mill / Voucher No)..."
+              autocomplete="off"
+              data-field="sugar_purchase"
+              @focus="onLedgerFocus('sugar_purchase', 'Sugar Purchase')"
+              @input="onLedgerInput('sugar_purchase', 'Sugar Purchase')"
+              @keydown="handleFieldKeyDown($event, 'sugar_purchase')"
+            />
+            <LedgerDropdown
+              v-if="activeDropdownField === 'sugar_purchase'"
+              :matches="dropdownMatches"
+              :active-index="dropdownIndex"
+              @select="selectDropdownMatch"
+              @hover="dropdownIndex = $event"
+            />
+          </div>
+        </div>
+
+        <!-- Selected Sugar Purchase Info Banner -->
+        <div v-if="selectedPurchasePaymentLot" style="background: #edf3fd; border-left: 3px solid var(--blue); padding: 8px 12px; margin-bottom: 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
+          <span>🏭 Mill: <strong style="color: var(--navy);">{{ selectedPurchasePaymentLot.supplier }}</strong> · Grade: <strong>{{ selectedPurchasePaymentLot.item }}</strong> · Total Lot: <strong>{{ selectedPurchasePaymentLot.purchase_qty_quintal }} Qtl</strong></span>
+          <span>Purchase Amount: <strong style="color: var(--navy); font-size: 13.5px;">₹{{ formatCurrency(selectedPurchasePaymentLot.total_amount) }}</strong></span>
+        </div>
+
         <div class="field-grid">
           <div class="field-row">
             <label>Bank / Cash Account</label>
@@ -659,6 +690,7 @@ const currentConfig = computed(() => VOUCHER_CONFIGS[voucherType.value] || VOUCH
 
 // Form State
 const selectedPurchaseLot = ref(null)
+const selectedPurchasePaymentLot = ref(null)
 const selectedDispatchEntry = ref(null)
 
 const form = reactive({
@@ -776,7 +808,13 @@ const selectDropdownMatch = (match) => {
     form[fieldName] = match.name
     if (fieldName === 'sugar_purchase' && match.details) {
       selectedPurchaseLot.value = match.details
+      selectedPurchasePaymentLot.value = match.details
       if (match.details.item) form.item = match.details.item
+      if (match.details.supplier) form.supplier = match.details.supplier
+      if (voucherType.value === 'payment') {
+        if (match.details.total_amount) form.total_amount = match.details.total_amount
+        if (match.details.total_amount) form.paid_amount = match.details.total_amount
+      }
     } else if (fieldName === 'dispatch_entry' && match.details) {
       selectedDispatchEntry.value = match.details
       if (match.details.customer_name) form.customer = match.details.customer_name
@@ -803,7 +841,7 @@ const getFieldSequence = () => {
   } else if (voucherType.value === 'dispatch') {
     return ['date', 'sugar_purchase', 'customer_name', 'broker', 'vehicle_no', 'item', 'qty', 'rate', 'narration']
   } else if (voucherType.value === 'payment') {
-    return ['date', 'bank_account', 'supplier', 'payment_mode', 'utr_no', 'paid_amount', 'narration']
+    return ['date', 'sugar_purchase', 'bank_account', 'supplier', 'payment_mode', 'utr_no', 'paid_amount', 'narration']
   } else if (voucherType.value === 'receipt') {
     return ['date', 'dispatch_entry', 'bank_account', 'customer', 'payment_mode', 'utr_no', 'paid_amount', 'narration']
   }
