@@ -88,7 +88,7 @@ def search_ledgers_and_parties(query=None, doctype=None, limit=50, **kwargs):
                 or_filters["name"] = ["like", f"%{query}%"]
                 or_filters["customer_name"] = ["like", f"%{query}%"]
                 or_filters["broker"] = ["like", f"%{query}%"]
-            fields = ["name", "customer_name", "broker", "vehicle_no", "total_amount", "balance_amount"]
+            fields = ["name", "customer_name", "broker", "vehicle_no", "total_amount", "paid_amount", "balance_amount", "rate", "dispatch_qty_quintal", "item", "dispatch_date"]
         else:
             fields = ["name"]
 
@@ -109,7 +109,7 @@ def search_ledgers_and_parties(query=None, doctype=None, limit=50, **kwargs):
                 display_name = f"{d.name} — {d.supplier} ({d.item})"
                 extra_type = f"Stock: {flt(d.available_qty_quintal)} Qtl"
             elif doctype == "Dispatch Entry":
-                display_name = f"{d.name} — {d.customer_name}"
+                display_name = f"{d.name} — {d.customer_name} ({d.broker or 'Direct'})"
                 extra_type = f"Bal: ₹{flt(d.balance_amount)}"
             else:
                 display_name = (

@@ -415,8 +415,39 @@
         </div>
       </div>
 
-      <!-- 4. BROKER RECEIPT (F6) -->
+      <!-- 4. BROKER PARTY PAYMENT (RECEIPT) (F6) -->
       <div v-else-if="voucherType === 'receipt'">
+        <!-- Dispatch Entry Reference Selector -->
+        <div class="field-row">
+          <label>Source Dispatch Entry</label>
+          <div class="input-control-wrap">
+            <input
+              ref="field_dispatch_entry"
+              v-model="form.dispatch_entry"
+              type="text"
+              placeholder="Select Dispatch Entry (DIS-ENT-... / Party / Broker)..."
+              autocomplete="off"
+              data-field="dispatch_entry"
+              @focus="onLedgerFocus('dispatch_entry', 'Dispatch Entry')"
+              @input="onLedgerInput('dispatch_entry', 'Dispatch Entry')"
+              @keydown="handleFieldKeyDown($event, 'dispatch_entry')"
+            />
+            <LedgerDropdown
+              v-if="activeDropdownField === 'dispatch_entry'"
+              :matches="dropdownMatches"
+              :active-index="dropdownIndex"
+              @select="selectDropdownMatch"
+              @hover="dropdownIndex = $event"
+            />
+          </div>
+        </div>
+
+        <!-- Selected Dispatch Entry Live Info Banner -->
+        <div v-if="selectedDispatchEntry" style="background: #edf3fd; border-left: 3px solid var(--blue); padding: 8px 12px; margin-bottom: 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
+          <span>🚚 Customer: <strong style="color: var(--navy);">{{ selectedDispatchEntry.customer_name }}</strong> · Broker: <strong>{{ selectedDispatchEntry.broker || 'Direct' }}</strong> · Total: <strong>₹{{ formatCurrency(selectedDispatchEntry.total_amount) }}</strong></span>
+          <span>Balance Due: <strong style="color: var(--gold); font-size: 13.5px;">₹{{ formatCurrency(selectedDispatchEntry.balance_amount) }}</strong></span>
+        </div>
+
         <div class="field-grid">
           <div class="field-row">
             <label>Bank / Cash Account</label>
@@ -628,10 +659,12 @@ const currentConfig = computed(() => VOUCHER_CONFIGS[voucherType.value] || VOUCH
 
 // Form State
 const selectedPurchaseLot = ref(null)
+const selectedDispatchEntry = ref(null)
 
 const form = reactive({
   date: new Date().toISOString().split('T')[0],
   sugar_purchase: '',
+  dispatch_entry: '',
   supplier: '',
   customer: '',
   customer_name: '',
@@ -744,6 +777,11 @@ const selectDropdownMatch = (match) => {
     if (fieldName === 'sugar_purchase' && match.details) {
       selectedPurchaseLot.value = match.details
       if (match.details.item) form.item = match.details.item
+    } else if (fieldName === 'dispatch_entry' && match.details) {
+      selectedDispatchEntry.value = match.details
+      if (match.details.customer_name) form.customer = match.details.customer_name
+      if (match.details.broker) form.broker = match.details.broker
+      if (match.details.balance_amount !== undefined) form.paid_amount = match.details.balance_amount
     }
   }
 
@@ -767,7 +805,7 @@ const getFieldSequence = () => {
   } else if (voucherType.value === 'payment') {
     return ['date', 'bank_account', 'supplier', 'payment_mode', 'utr_no', 'paid_amount', 'narration']
   } else if (voucherType.value === 'receipt') {
-    return ['date', 'bank_account', 'customer', 'payment_mode', 'utr_no', 'paid_amount', 'narration']
+    return ['date', 'dispatch_entry', 'bank_account', 'customer', 'payment_mode', 'utr_no', 'paid_amount', 'narration']
   }
   return ['date', 'narration']
 }
