@@ -57,6 +57,7 @@ const MENU_COMMANDS = [
   { title: 'Day Book & Transaction Audit Register', route: '/daybook', shortcut: 'F10', category: 'Report' },
   { title: 'Gateway of Sugar Module', route: '/', shortcut: 'Esc', category: 'Navigation' },
   { title: 'Masters Directory (Suppliers, Customers, Brokers, Items)', route: '/masters', shortcut: 'M', category: 'Masters' },
+  { title: 'ERPNext Desk (Frappe Admin)', externalUrl: '/app', shortcut: 'Admin', category: 'System' },
 ]
 
 const filteredItems = computed(() => {
@@ -85,7 +86,11 @@ const close = () => {
 
 const selectItem = (item) => {
   close()
-  if (item.route) router.push(item.route)
+  if (item.externalUrl) {
+    window.location.href = window.location.port === '8080' ? `http://${window.location.hostname}:8001${item.externalUrl}` : item.externalUrl
+  } else if (item.route) {
+    router.push(item.route)
+  }
 }
 
 const handleKeyDown = (e) => {

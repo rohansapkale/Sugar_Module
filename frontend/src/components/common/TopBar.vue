@@ -14,6 +14,15 @@
       <span class="user-name">👤 {{ userName }}</span>
       <span class="today-date">📅 {{ formattedDate }}</span>
       
+      <!-- Admin / ERPNext Desk Button -->
+      <button
+        class="admin-desk-btn"
+        title="Open ERPNext Admin Desk"
+        @click="goToErpNext"
+      >
+        <span class="admin-label">⚡ ERPNext Admin</span>
+      </button>
+
       <!-- Dark / Light Mode Toggle Button -->
       <button
         class="theme-toggle-btn"
@@ -56,9 +65,40 @@ const formattedDate = computed(() => {
 const openGoTo = () => {
   globalUiState.isGoToOpen.value = true
 }
+
+const goToErpNext = () => {
+  if (window.location.port === '8080') {
+    window.location.href = `http://${window.location.hostname}:8001/app`
+  } else {
+    window.location.href = '/app'
+  }
+}
 </script>
 
 <style scoped>
+.admin-desk-btn {
+  background: #2563eb;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  padding: 4px 11px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+  user-select: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.admin-desk-btn:hover {
+  background: #1d4ed8;
+  border-color: #fff;
+  transform: translateY(-1px);
+}
+
 .theme-toggle-btn {
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.25);
@@ -81,7 +121,7 @@ const openGoTo = () => {
   transform: translateY(-1px);
 }
 
-.theme-label {
+.theme-label, .admin-label {
   display: flex;
   align-items: center;
   gap: 4px;
