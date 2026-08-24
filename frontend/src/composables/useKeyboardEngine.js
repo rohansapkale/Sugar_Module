@@ -1,5 +1,5 @@
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { router } from '../router'
 
 export const VOUCHER_TYPE_MAP = {
   F4: { name: 'Contra', title: 'Contra Voucher', route: '/voucher/contra' },
@@ -46,13 +46,45 @@ export function closeConfirm(isConfirmed) {
   }
 }
 
-export function useKeyboardEngine(callbacks = {}) {
-  const router = useRouter()
+export function handleFunctionKey(fk) {
+  if (fk === 'F1') {
+    globalUiState.isHelpOpen.value = true
+    return
+  }
+  if (fk === 'F2') {
+    globalUiState.isDateModalOpen.value = true
+    return
+  }
+  if (fk === 'F10') {
+    if (router) router.push('/daybook')
+    return
+  }
+  if (fk === 'F11' || fk === 'F12') {
+    showToast(`${fk} — Configuration & Company Settings`)
+    return
+  }
 
-  const handleGlobalKeyDown = (e) => {
-    // 1. If Alt+G pressed -> toggle Go To palette
-    if (e.altKey && (e.key === 'g' || e.key === 'G')) {
+  if (VOUCHER_TYPE_MAP[fk]) {
+    const v = VOUCHER_TYPE_MAP[fk]
+    if (router) router.push(v.route)
+  }
+}
+
+// Singleton Global Keydown Handler to prevent duplicate listeners
+let isGlobalListenerAttached = false
+
+function initGlobalKeyboardListener() {
+  if (isGlobalListenerAttached || typeof window === 'undefined') return
+  isGlobalListenerAttached = true
+
+  window.addEventListener('keydown', (e) => {
+    // 1. Alt+G / Alt+g / Ctrl+G / Ctrl+K -> Toggle Go To Command Palette
+    const isGKey = e.key === 'g' || e.key === 'G' || e.code === 'KeyG'
+    const isKKey = e.key === 'k' || e.key === 'K' || e.code === 'KeyK'
+
+    if ((e.altKey && isGKey) || (e.ctrlKey && (isGKey || isKKey))) {
       e.preventDefault()
+      e.stopPropagation()
       globalUiState.isGoToOpen.value = !globalUiState.isGoToOpen.value
       return
     }
@@ -94,55 +126,13 @@ export function useKeyboardEngine(callbacks = {}) {
       handleFunctionKey(e.key)
       return
     }
+  }, { capture: true })
+}
 
-    // 6. Delegate view-specific keys if provided
-    if (callbacks.onKeyDown) {
-      const handled = callbacks.onKeyDown(e)
-      if (handled) return
-    }
+// Auto-initialize singleton listener
+initGlobalKeyboardListener()
 
-    // 7. Global Escape navigation fallback
-    if (e.key === 'Escape') {
-      if (callbacks.onEscape) {
-        callbacks.onEscape()
-      } else if (router && router.currentRoute.value.path !== '/') {
-        router.push('/')
-      }
-    }
-  }
-
-  const handleFunctionKey = (fk) => {
-    if (fk === 'F1') {
-      globalUiState.isHelpOpen.value = true
-      return
-    }
-    if (fk === 'F2') {
-      globalUiState.isDateModalOpen.value = true
-      return
-    }
-    if (fk === 'F10') {
-      if (router) router.push('/daybook')
-      return
-    }
-    if (fk === 'F11' || fk === 'F12') {
-      showToast(`${fk} — Configuration & Company Settings`)
-      return
-    }
-
-    if (VOUCHER_TYPE_MAP[fk]) {
-      const v = VOUCHER_TYPE_MAP[fk]
-      if (router) router.push(v.route)
-    }
-  }
-
-  onMounted(() => {
-    window.addEventListener('keydown', handleGlobalKeyDown)
-  })
-
-  onUnmounted(() => {
-    window.removeEventListener('keydown', handleGlobalKeyDown)
-  })
-
+export function useKeyboardEngine() {
   return {
     globalUiState,
     handleFunctionKey,
