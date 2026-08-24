@@ -92,13 +92,16 @@ def search_ledgers_and_parties(query=None, doctype=None, limit=50, **kwargs):
         else:
             fields = ["name"]
 
+        # Order by creation desc for vouchers/purchases so latest records appear at the top
+        order_by = "creation desc" if doctype in ("Sugar Purchase", "Dispatch Entry", "Purchase Payment", "Broker Party Payment") else "name asc"
+
         docs = frappe.get_all(
             doctype,
             filters=filters,
             or_filters=or_filters if query else None,
             fields=fields,
             limit=limit,
-            order_by="name asc",
+            order_by=order_by,
             ignore_permissions=True
         )
         for d in docs:
