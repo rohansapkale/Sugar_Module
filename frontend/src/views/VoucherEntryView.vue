@@ -1,44 +1,82 @@
 <template>
   <div id="main-layout">
     <div id="content-area">
+      <!-- Header Section -->
       <div class="v-header-section">
         <div>
-          <div class="v-title">{{ currentConfig.title }}</div>
-          <div style="font-size: 12.5px; color: var(--navy); font-weight: 600; margin-top: 2px;">
-            Status: <span style="font-family: monospace; color: var(--blue);">Draft / New</span>
+          <div class="v-title">{{ isReadOnly ? `View ${currentConfig.title}` : currentConfig.title }}</div>
+          <div style="font-size: 12.5px; margin-top: 3px; display: flex; align-items: center; gap: 8px;">
+            <span v-if="isReadOnly" class="status-pill readonly-status">
+              🔒 View Mode (Uneditable / Submitted) — {{ voucherId }}
+            </span>
+            <span v-else style="color: var(--navy); font-weight: 600;">
+              Status: <span style="font-family: monospace; color: var(--blue);">Draft / New</span>
+            </span>
           </div>
         </div>
-        <div style="display: flex; gap: 8px; align-items: center;">
+
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <!-- Print Voucher Button -->
+          <button
+            v-if="isReadOnly"
+            type="button"
+            class="btn-header-tool"
+            title="Print this Voucher Document"
+            @click="printSingleVoucher"
+          >
+            <span>🖨️</span> Print Voucher
+          </button>
+
+          <!-- New Voucher Button (when in View Mode) -->
+          <button
+            v-if="isReadOnly"
+            type="button"
+            class="btn-header-tool"
+            title="Create New Voucher"
+            @click="createNewVoucher"
+          >
+            <span>➕</span> New Voucher
+          </button>
+
+          <!-- Register Navigation Shortcuts -->
           <button
             v-if="voucherType === 'purchase'"
             type="button"
-            style="padding: 6px 12px; background: #eef3fc; color: var(--navy); border: 1px solid var(--blue); border-radius: 4px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;"
+            class="btn-header-tool"
             @click="router.push('/register/purchase')"
           >
-            📋 Purchases List (<kbd style="background: var(--navy); color: #fff; padding: 1px 5px; border-radius: 3px; font-size: 11px;">Alt+L</kbd>)
+            📋 Purchases List (<kbd>Esc</kbd>)
           </button>
           <button
             v-else-if="voucherType === 'dispatch'"
             type="button"
-            style="padding: 6px 12px; background: #eef3fc; color: var(--navy); border: 1px solid var(--blue); border-radius: 4px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;"
+            class="btn-header-tool"
             @click="router.push('/register/dispatch')"
           >
-            📋 Dispatches List (<kbd style="background: var(--navy); color: #fff; padding: 1px 5px; border-radius: 3px; font-size: 11px;">Alt+L</kbd>)
+            📋 Dispatches List (<kbd>Esc</kbd>)
           </button>
           <button
             v-else-if="voucherType === 'payment'"
             type="button"
-            style="padding: 6px 12px; background: #eef3fc; color: var(--navy); border: 1px solid var(--blue); border-radius: 4px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;"
+            class="btn-header-tool"
             @click="router.push('/register/payment')"
           >
-            📋 Payments List (<kbd style="background: var(--navy); color: #fff; padding: 1px 5px; border-radius: 3px; font-size: 11px;">Alt+L</kbd>)
+            📋 Payments List (<kbd>Esc</kbd>)
+          </button>
+          <button
+            v-else-if="voucherType === 'receipt'"
+            type="button"
+            class="btn-header-tool"
+            @click="router.push('/register/receipt')"
+          >
+            📋 Receipts List (<kbd>Esc</kbd>)
           </button>
         </div>
       </div>
 
       <!-- Base Meta Fields -->
       <div class="field-grid">
-        <div class="field-row">
+        <div :class="['field-row', { 'readonly-row': isReadOnly }]">
           <label>Voucher Date</label>
           <div class="input-control-wrap">
             <input
@@ -46,6 +84,8 @@
               v-model="form.date"
               type="date"
               data-field="date"
+              :readonly="isReadOnly"
+              :disabled="isReadOnly"
               @keydown="handleFieldKeyDown($event, 'date')"
             />
           </div>
@@ -54,14 +94,14 @@
         <div class="field-row disabled">
           <label>Company</label>
           <div class="input-control-wrap">
-            <input type="text" :value="defaultCompany" readonly />
+            <input type="text" :value="defaultCompany" readonly disabled />
           </div>
         </div>
       </div>
 
       <!-- 1. SUGAR PURCHASE (F9) -->
       <div v-if="voucherType === 'purchase'">
-        <div class="field-row">
+        <div :class="['field-row', { 'readonly-row': isReadOnly }]">
           <label>Supplier (Sugar Mill)</label>
           <div class="input-control-wrap">
             <input
@@ -71,12 +111,14 @@
               placeholder="Select sugar mill / supplier..."
               autocomplete="off"
               data-field="supplier"
+              :readonly="isReadOnly"
+              :disabled="isReadOnly"
               @focus="onLedgerFocus('supplier', 'Supplier')"
               @input="onLedgerInput('supplier', 'Supplier')"
               @keydown="handleFieldKeyDown($event, 'supplier')"
             />
             <LedgerDropdown
-              v-if="activeDropdownField === 'supplier'"
+              v-if="!isReadOnly && activeDropdownField === 'supplier'"
               :matches="dropdownMatches"
               :active-index="dropdownIndex"
               @select="selectDropdownMatch"
@@ -86,7 +128,7 @@
         </div>
 
         <div class="field-grid">
-          <div class="field-row">
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
             <label>Sugar Item / Grade</label>
             <div class="input-control-wrap">
               <input
@@ -96,12 +138,14 @@
                 placeholder="Select item (e.g. S-302526, M30)..."
                 autocomplete="off"
                 data-field="item"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 @focus="onLedgerFocus('item', 'Item')"
                 @input="onLedgerInput('item', 'Item')"
                 @keydown="handleFieldKeyDown($event, 'item')"
               />
               <LedgerDropdown
-                v-if="activeDropdownField === 'item'"
+                v-if="!isReadOnly && activeDropdownField === 'item'"
                 :matches="dropdownMatches"
                 :active-index="dropdownIndex"
                 @select="selectDropdownMatch"
@@ -110,7 +154,7 @@
             </div>
           </div>
 
-          <div class="field-row">
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
             <label>Qty (Quintals)</label>
             <div class="input-control-wrap">
               <input
@@ -120,6 +164,8 @@
                 step="0.01"
                 placeholder="0.00"
                 data-field="qty"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 @input="calcPurchaseTotal"
                 @keydown="handleFieldKeyDown($event, 'qty')"
               />
@@ -128,7 +174,7 @@
         </div>
 
         <div class="field-grid">
-          <div class="field-row">
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
             <label>Purchase Rate (₹/Qtl)</label>
             <div class="input-control-wrap">
               <input
@@ -138,6 +184,8 @@
                 step="0.01"
                 placeholder="0.00"
                 data-field="rate"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 @input="calcPurchaseTotal"
                 @keydown="handleFieldKeyDown($event, 'rate')"
               />
@@ -147,7 +195,7 @@
           <div class="field-row disabled">
             <label>Total Sugar Amount</label>
             <div class="input-control-wrap">
-              <input type="text" :value="formatCurrency(form.total_amount)" readonly style="font-weight: 700; color: var(--navy);" />
+              <input type="text" :value="'₹' + formatCurrency(form.total_amount)" readonly disabled style="font-weight: 700; color: var(--navy);" />
             </div>
           </div>
         </div>
@@ -156,7 +204,7 @@
       <!-- 2. DISPATCH ENTRY (F8) -->
       <div v-else-if="voucherType === 'dispatch'">
         <!-- Sugar Purchase Lot Selector -->
-        <div class="field-row">
+        <div :class="['field-row', { 'readonly-row': isReadOnly }]">
           <label>Source Sugar Purchase</label>
           <div class="input-control-wrap">
             <input
@@ -166,12 +214,14 @@
               placeholder="Select source Sugar Purchase lot (Mill / Voucher No)..."
               autocomplete="off"
               data-field="sugar_purchase"
+              :readonly="isReadOnly"
+              :disabled="isReadOnly"
               @focus="onLedgerFocus('sugar_purchase', 'Sugar Purchase')"
               @input="onLedgerInput('sugar_purchase', 'Sugar Purchase')"
               @keydown="handleFieldKeyDown($event, 'sugar_purchase')"
             />
             <LedgerDropdown
-              v-if="activeDropdownField === 'sugar_purchase'"
+              v-if="!isReadOnly && activeDropdownField === 'sugar_purchase'"
               :matches="dropdownMatches"
               :active-index="dropdownIndex"
               @select="selectDropdownMatch"
@@ -181,13 +231,13 @@
         </div>
 
         <!-- Selected Purchase Lot Live Stock Info Banner -->
-        <div v-if="selectedPurchaseLot" style="background: #edf3fd; border-left: 3px solid var(--blue); padding: 8px 12px; margin-bottom: 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
+        <div v-if="selectedPurchaseLot" style="background: var(--panel-soft); border-left: 3px solid var(--blue); padding: 8px 12px; margin-bottom: 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
           <span>🏭 Mill: <strong style="color: var(--navy);">{{ selectedPurchaseLot.supplier }}</strong> · Grade: <strong>{{ selectedPurchaseLot.item }}</strong> · Lot Qty: <strong>{{ selectedPurchaseLot.purchase_qty_quintal }} Qtl</strong></span>
           <span>Stock Available: <strong style="color: var(--green); font-size: 13.5px;">{{ selectedPurchaseLot.available_qty_quintal }} Qtl</strong></span>
         </div>
 
         <div class="field-grid">
-          <div class="field-row">
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
             <label>Customer Party</label>
             <div class="input-control-wrap">
               <input
@@ -197,12 +247,14 @@
                 placeholder="Select customer party..."
                 autocomplete="off"
                 data-field="customer_name"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 @focus="onLedgerFocus('customer_name', 'Customer')"
                 @input="onLedgerInput('customer_name', 'Customer')"
                 @keydown="handleFieldKeyDown($event, 'customer_name')"
               />
               <LedgerDropdown
-                v-if="activeDropdownField === 'customer_name'"
+                v-if="!isReadOnly && activeDropdownField === 'customer_name'"
                 :matches="dropdownMatches"
                 :active-index="dropdownIndex"
                 @select="selectDropdownMatch"
@@ -211,7 +263,7 @@
             </div>
           </div>
 
-          <div class="field-row">
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
             <label>Broker Name</label>
             <div class="input-control-wrap">
               <input
@@ -221,12 +273,14 @@
                 placeholder="Select broker..."
                 autocomplete="off"
                 data-field="broker"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 @focus="onLedgerFocus('broker', 'Broker')"
                 @input="onLedgerInput('broker', 'Broker')"
                 @keydown="handleFieldKeyDown($event, 'broker')"
               />
               <LedgerDropdown
-                v-if="activeDropdownField === 'broker'"
+                v-if="!isReadOnly && activeDropdownField === 'broker'"
                 :matches="dropdownMatches"
                 :active-index="dropdownIndex"
                 @select="selectDropdownMatch"
@@ -237,7 +291,7 @@
         </div>
 
         <div class="field-grid">
-          <div class="field-row">
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
             <label>Vehicle No.</label>
             <div class="input-control-wrap">
               <input
@@ -246,38 +300,32 @@
                 type="text"
                 placeholder="e.g. MH19CZ1234"
                 data-field="vehicle_no"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 @keydown="handleFieldKeyDown($event, 'vehicle_no')"
               />
             </div>
           </div>
 
-          <div class="field-row">
-            <label>Sugar Item</label>
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
+            <label>Sugar Item / Grade</label>
             <div class="input-control-wrap">
               <input
                 ref="field_item"
                 v-model="form.item"
                 type="text"
-                placeholder="Select item..."
-                autocomplete="off"
+                placeholder="Grade (S-30, M30)..."
                 data-field="item"
-                @focus="onLedgerFocus('item', 'Item')"
-                @input="onLedgerInput('item', 'Item')"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 @keydown="handleFieldKeyDown($event, 'item')"
-              />
-              <LedgerDropdown
-                v-if="activeDropdownField === 'item'"
-                :matches="dropdownMatches"
-                :active-index="dropdownIndex"
-                @select="selectDropdownMatch"
-                @hover="dropdownIndex = $event"
               />
             </div>
           </div>
         </div>
 
         <div class="field-grid">
-          <div class="field-row">
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
             <label>Dispatch Qty (Qtl)</label>
             <div class="input-control-wrap">
               <input
@@ -287,14 +335,16 @@
                 step="0.01"
                 placeholder="0.00"
                 data-field="qty"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 @input="calcDispatchTotal"
                 @keydown="handleFieldKeyDown($event, 'qty')"
               />
             </div>
           </div>
 
-          <div class="field-row">
-            <label>Sale Rate (₹/Qtl)</label>
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
+            <label>Rate (₹/Qtl)</label>
             <div class="input-control-wrap">
               <input
                 ref="field_rate"
@@ -303,33 +353,43 @@
                 step="0.01"
                 placeholder="0.00"
                 data-field="rate"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 @input="calcDispatchTotal"
                 @keydown="handleFieldKeyDown($event, 'rate')"
               />
             </div>
           </div>
         </div>
+
+        <div class="field-row disabled">
+          <label>Total Dispatch Amount</label>
+          <div class="input-control-wrap">
+            <input type="text" :value="'₹' + formatCurrency(form.total_amount)" readonly disabled style="font-weight: 700; color: var(--navy);" />
+          </div>
+        </div>
       </div>
 
       <!-- 3. PURCHASE PAYMENT (F5) -->
       <div v-else-if="voucherType === 'payment'">
-        <!-- Sugar Purchase Lot Selector for Payment -->
-        <div class="field-row">
+        <div :class="['field-row', { 'readonly-row': isReadOnly }]">
           <label>Source Sugar Purchase</label>
           <div class="input-control-wrap">
             <input
-              ref="field_sugar_purchase"
+              ref="field_sugar_purchase_pay"
               v-model="form.sugar_purchase"
               type="text"
-              placeholder="Select Sugar Purchase lot (Mill / Voucher No)..."
+              placeholder="Select Sugar Purchase lot being paid..."
               autocomplete="off"
-              data-field="sugar_purchase"
-              @focus="onLedgerFocus('sugar_purchase', 'Sugar Purchase')"
-              @input="onLedgerInput('sugar_purchase', 'Sugar Purchase')"
-              @keydown="handleFieldKeyDown($event, 'sugar_purchase')"
+              data-field="sugar_purchase_pay"
+              :readonly="isReadOnly"
+              :disabled="isReadOnly"
+              @focus="onLedgerFocus('sugar_purchase_pay', 'Sugar Purchase')"
+              @input="onLedgerInput('sugar_purchase_pay', 'Sugar Purchase')"
+              @keydown="handleFieldKeyDown($event, 'sugar_purchase_pay')"
             />
             <LedgerDropdown
-              v-if="activeDropdownField === 'sugar_purchase'"
+              v-if="!isReadOnly && activeDropdownField === 'sugar_purchase_pay'"
               :matches="dropdownMatches"
               :active-index="dropdownIndex"
               @select="selectDropdownMatch"
@@ -338,53 +398,42 @@
           </div>
         </div>
 
-        <!-- Selected Sugar Purchase Info Banner -->
-        <div v-if="selectedPurchasePaymentLot" style="background: #edf3fd; border-left: 3px solid var(--blue); padding: 8px 12px; margin-bottom: 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
-          <span>🏭 Mill: <strong style="color: var(--navy);">{{ selectedPurchasePaymentLot.supplier }}</strong> · Grade: <strong>{{ selectedPurchasePaymentLot.item }}</strong> · Total Lot: <strong>{{ selectedPurchasePaymentLot.purchase_qty_quintal }} Qtl</strong></span>
-          <span>Purchase Amount: <strong style="color: var(--navy); font-size: 13.5px;">₹{{ formatCurrency(selectedPurchasePaymentLot.total_amount) }}</strong></span>
-        </div>
-
         <div class="field-grid">
-          <div class="field-row">
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
+            <label>Sugar Mill (Supplier)</label>
+            <div class="input-control-wrap">
+              <input
+                ref="field_supplier"
+                v-model="form.supplier"
+                type="text"
+                placeholder="Sugar Mill Name..."
+                data-field="supplier"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
+                @focus="onLedgerFocus('supplier', 'Supplier')"
+                @input="onLedgerInput('supplier', 'Supplier')"
+                @keydown="handleFieldKeyDown($event, 'supplier')"
+              />
+            </div>
+          </div>
+
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
             <label>Bank / Cash Account</label>
             <div class="input-control-wrap">
               <input
                 ref="field_bank"
                 v-model="form.bank_account"
                 type="text"
-                placeholder="Select Bank / Cash A/c..."
-                autocomplete="off"
+                placeholder="Select Bank / Cash Account..."
                 data-field="bank_account"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 @focus="onLedgerFocus('bank_account', 'Account')"
                 @input="onLedgerInput('bank_account', 'Account')"
                 @keydown="handleFieldKeyDown($event, 'bank_account')"
               />
               <LedgerDropdown
-                v-if="activeDropdownField === 'bank_account'"
-                :matches="dropdownMatches"
-                :active-index="dropdownIndex"
-                @select="selectDropdownMatch"
-                @hover="dropdownIndex = $event"
-              />
-            </div>
-          </div>
-
-          <div class="field-row">
-            <label>Supplier (Paid To)</label>
-            <div class="input-control-wrap">
-              <input
-                ref="field_supplier"
-                v-model="form.supplier"
-                type="text"
-                placeholder="Select supplier/mill..."
-                autocomplete="off"
-                data-field="supplier"
-                @focus="onLedgerFocus('supplier', 'Supplier')"
-                @input="onLedgerInput('supplier', 'Supplier')"
-                @keydown="handleFieldKeyDown($event, 'supplier')"
-              />
-              <LedgerDropdown
-                v-if="activeDropdownField === 'supplier'"
+                v-if="!isReadOnly && activeDropdownField === 'bank_account'"
                 :matches="dropdownMatches"
                 :active-index="dropdownIndex"
                 @select="selectDropdownMatch"
@@ -395,41 +444,40 @@
         </div>
 
         <div class="field-grid">
-          <div class="field-row">
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
             <label>Payment Mode</label>
             <div class="input-control-wrap">
-              <select
+              <input
                 ref="field_mode"
                 v-model="form.payment_mode"
+                type="text"
+                placeholder="RTGS, NEFT, Cheque, UPI..."
                 data-field="payment_mode"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 @keydown="handleFieldKeyDown($event, 'payment_mode')"
-              >
-                <option value="RTGS">RTGS</option>
-                <option value="NEFT">NEFT</option>
-                <option value="IMPS">IMPS</option>
-                <option value="UPI">UPI</option>
-                <option value="Cheque">Cheque</option>
-                <option value="Cash">Cash</option>
-              </select>
+              />
             </div>
           </div>
 
-          <div class="field-row">
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
             <label>UTR / Ref No.</label>
             <div class="input-control-wrap">
               <input
                 ref="field_utr"
                 v-model="form.utr_no"
                 type="text"
-                placeholder="e.g. UTR / Ref No."
+                placeholder="UTR / Ref No."
                 data-field="utr_no"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 @keydown="handleFieldKeyDown($event, 'utr_no')"
               />
             </div>
           </div>
         </div>
 
-        <div class="field-row">
+        <div :class="['field-row', { 'readonly-row': isReadOnly }]">
           <label>Paid Amount (₹)</label>
           <div class="input-control-wrap">
             <input
@@ -440,31 +488,34 @@
               placeholder="0.00"
               style="font-size: 15px; font-weight: 700; color: var(--navy);"
               data-field="paid_amount"
+              :readonly="isReadOnly"
+              :disabled="isReadOnly"
               @keydown="handleFieldKeyDown($event, 'paid_amount')"
             />
           </div>
         </div>
       </div>
 
-      <!-- 4. BROKER PARTY PAYMENT (RECEIPT) (F6) -->
+      <!-- 4. BROKER RECEIPT (F6) -->
       <div v-else-if="voucherType === 'receipt'">
-        <!-- Dispatch Entry Reference Selector -->
-        <div class="field-row">
+        <div :class="['field-row', { 'readonly-row': isReadOnly }]">
           <label>Source Dispatch Entry</label>
           <div class="input-control-wrap">
             <input
               ref="field_dispatch_entry"
               v-model="form.dispatch_entry"
               type="text"
-              placeholder="Select Dispatch Entry (DIS-ENT-... / Party / Broker)..."
+              placeholder="Select Dispatch Entry being received..."
               autocomplete="off"
               data-field="dispatch_entry"
+              :readonly="isReadOnly"
+              :disabled="isReadOnly"
               @focus="onLedgerFocus('dispatch_entry', 'Dispatch Entry')"
               @input="onLedgerInput('dispatch_entry', 'Dispatch Entry')"
               @keydown="handleFieldKeyDown($event, 'dispatch_entry')"
             />
             <LedgerDropdown
-              v-if="activeDropdownField === 'dispatch_entry'"
+              v-if="!isReadOnly && activeDropdownField === 'dispatch_entry'"
               :matches="dropdownMatches"
               :active-index="dropdownIndex"
               @select="selectDropdownMatch"
@@ -473,29 +524,62 @@
           </div>
         </div>
 
-        <!-- Selected Dispatch Entry Live Info Banner -->
-        <div v-if="selectedDispatchEntry" style="background: #edf3fd; border-left: 3px solid var(--blue); padding: 8px 12px; margin-bottom: 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
-          <span>🚚 Customer: <strong style="color: var(--navy);">{{ selectedDispatchEntry.customer_name }}</strong> · Broker: <strong>{{ selectedDispatchEntry.broker || 'Direct' }}</strong> · Total: <strong>₹{{ formatCurrency(selectedDispatchEntry.total_amount) }}</strong></span>
-          <span>Balance Due: <strong style="color: var(--gold); font-size: 13.5px;">₹{{ formatCurrency(selectedDispatchEntry.balance_amount) }}</strong></span>
+        <div class="field-grid">
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
+            <label>Customer Party</label>
+            <div class="input-control-wrap">
+              <input
+                ref="field_customer"
+                v-model="form.customer_name"
+                type="text"
+                placeholder="Customer Party..."
+                data-field="customer_name"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
+                @focus="onLedgerFocus('customer_name', 'Customer')"
+                @input="onLedgerInput('customer_name', 'Customer')"
+                @keydown="handleFieldKeyDown($event, 'customer_name')"
+              />
+            </div>
+          </div>
+
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
+            <label>Broker Name</label>
+            <div class="input-control-wrap">
+              <input
+                ref="field_broker"
+                v-model="form.broker"
+                type="text"
+                placeholder="Broker Name..."
+                data-field="broker"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
+                @focus="onLedgerFocus('broker', 'Broker')"
+                @input="onLedgerInput('broker', 'Broker')"
+                @keydown="handleFieldKeyDown($event, 'broker')"
+              />
+            </div>
+          </div>
         </div>
 
         <div class="field-grid">
-          <div class="field-row">
-            <label>Bank / Cash Account</label>
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
+            <label>Deposit Account (Bank/Cash)</label>
             <div class="input-control-wrap">
               <input
                 ref="field_bank"
                 v-model="form.bank_account"
                 type="text"
-                placeholder="Select Bank / Cash A/c..."
-                autocomplete="off"
+                placeholder="Select Bank / Cash Account..."
                 data-field="bank_account"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 @focus="onLedgerFocus('bank_account', 'Account')"
                 @input="onLedgerInput('bank_account', 'Account')"
                 @keydown="handleFieldKeyDown($event, 'bank_account')"
               />
               <LedgerDropdown
-                v-if="activeDropdownField === 'bank_account'"
+                v-if="!isReadOnly && activeDropdownField === 'bank_account'"
                 :matches="dropdownMatches"
                 :active-index="dropdownIndex"
                 @select="selectDropdownMatch"
@@ -504,52 +588,7 @@
             </div>
           </div>
 
-          <div class="field-row">
-            <label>Customer Party</label>
-            <div class="input-control-wrap">
-              <input
-                ref="field_customer"
-                v-model="form.customer"
-                type="text"
-                placeholder="Select customer..."
-                autocomplete="off"
-                data-field="customer"
-                @focus="onLedgerFocus('customer', 'Customer')"
-                @input="onLedgerInput('customer', 'Customer')"
-                @keydown="handleFieldKeyDown($event, 'customer')"
-              />
-              <LedgerDropdown
-                v-if="activeDropdownField === 'customer'"
-                :matches="dropdownMatches"
-                :active-index="dropdownIndex"
-                @select="selectDropdownMatch"
-                @hover="dropdownIndex = $event"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div class="field-grid">
-          <div class="field-row">
-            <label>Payment Mode</label>
-            <div class="input-control-wrap">
-              <select
-                ref="field_mode"
-                v-model="form.payment_mode"
-                data-field="payment_mode"
-                @keydown="handleFieldKeyDown($event, 'payment_mode')"
-              >
-                <option value="NEFT">NEFT</option>
-                <option value="RTGS">RTGS</option>
-                <option value="IMPS">IMPS</option>
-                <option value="UPI">UPI</option>
-                <option value="Cheque">Cheque</option>
-                <option value="Cash">Cash</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="field-row">
+          <div :class="['field-row', { 'readonly-row': isReadOnly }]">
             <label>UTR / Ref No.</label>
             <div class="input-control-wrap">
               <input
@@ -558,13 +597,15 @@
                 type="text"
                 placeholder="UTR / Ref No."
                 data-field="utr_no"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 @keydown="handleFieldKeyDown($event, 'utr_no')"
               />
             </div>
           </div>
         </div>
 
-        <div class="field-row">
+        <div :class="['field-row', { 'readonly-row': isReadOnly }]">
           <label>Received Amount (₹)</label>
           <div class="input-control-wrap">
             <input
@@ -575,61 +616,16 @@
               placeholder="0.00"
               style="font-size: 15px; font-weight: 700; color: var(--navy);"
               data-field="paid_amount"
+              :readonly="isReadOnly"
+              :disabled="isReadOnly"
               @keydown="handleFieldKeyDown($event, 'paid_amount')"
             />
           </div>
         </div>
       </div>
 
-      <!-- Dynamic Particulars Table Grid -->
-      <table class="grid">
-        <thead>
-          <tr>
-            <th style="width: 65%;">Particulars / Additional Ledger</th>
-            <th style="width: 35%; text-align: right;">Amount (₹)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(row, idx) in form.additional_rows" :key="idx">
-            <td class="cell-wrap">
-              <input
-                :ref="el => setRowRef(el, idx, 'ledger')"
-                v-model="row.ledger"
-                type="text"
-                placeholder="Type additional ledger name (Freight, Commission, etc.)..."
-                autocomplete="off"
-                @focus="onLedgerFocus(`row-${idx}-ledger`, 'Account')"
-                @input="onLedgerInput(`row-${idx}-ledger`, 'Account')"
-                @keydown="handleRowKeyDown($event, idx, 'ledger')"
-              />
-              <LedgerDropdown
-                v-if="activeDropdownField === `row-${idx}-ledger`"
-                :matches="dropdownMatches"
-                :active-index="dropdownIndex"
-                @select="selectDropdownMatch"
-                @hover="dropdownIndex = $event"
-              />
-            </td>
-            <td class="amt">
-              <input
-                :ref="el => setRowRef(el, idx, 'amount')"
-                v-model.number="row.amount"
-                type="number"
-                step="0.01"
-                placeholder="0.00"
-                @keydown="handleRowKeyDown($event, idx, 'amount')"
-              />
-            </td>
-          </tr>
-          <tr class="total">
-            <td>Grand Total (₹)</td>
-            <td class="amt">{{ formatCurrency(grandTotal) }}</td>
-          </tr>
-        </tbody>
-      </table>
-
       <!-- Narration Section -->
-      <div class="field-row" style="margin-top: 14px;">
+      <div :class="['field-row', { 'readonly-row': isReadOnly }]" style="margin-top: 14px;">
         <label>Narration</label>
         <div class="input-control-wrap">
           <textarea
@@ -638,18 +634,43 @@
             rows="2"
             placeholder="Enter narration notes for this voucher..."
             data-field="narration"
+            :readonly="isReadOnly"
+            :disabled="isReadOnly"
             @keydown="handleNarrationKeyDown"
           ></textarea>
         </div>
       </div>
 
+      <!-- Action & Accept Bar -->
+      <div v-if="!isReadOnly" style="display: flex; justify-content: flex-end; margin-top: 16px;">
+        <button
+          type="button"
+          class="btn-save-voucher"
+          @click="promptAcceptVoucher"
+        >
+          <span>💾</span> Save &amp; Accept Voucher (Enter)
+        </button>
+      </div>
+
+      <div v-else style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+        <div style="color: var(--muted); font-size: 12.5px;">
+          Press <kbd>Esc</kbd> to return to Register list.
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn-tool" @click="printSingleVoucher">
+            <span>🖨️</span> Print Voucher
+          </button>
+          <button type="button" class="btn-save-voucher" @click="createNewVoucher">
+            <span>➕</span> New Voucher Entry
+          </button>
+        </div>
+      </div>
+
       <!-- Keyboard Cues Hint -->
-      <div class="keyboard-hint">
-        <span><kbd>Tab</kbd> / <kbd>Enter</kbd> Next Field</span>
-        <span><kbd>Shift+Tab</kbd> Prev Field</span>
-        <span><kbd>↑</kbd> <kbd>↓</kbd> Dropdown Nav</span>
-        <span><kbd>Esc</kbd> Clear / Discard</span>
-        <span><kbd>Enter</kbd> on Narration → <b>Accept</b></span>
+      <div class="keyboard-hint" style="margin-top: 16px;">
+        <span><kbd>Tab</kbd> / <kbd>Enter</kbd> Navigate</span>
+        <span><kbd>Esc</kbd> {{ isReadOnly ? 'Return to Register' : 'Clear / Discard' }}</span>
+        <span v-if="!isReadOnly"><kbd>Enter</kbd> on Narration → <b>Accept</b></span>
       </div>
     </div>
 
@@ -668,30 +689,35 @@ import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useFrappeApi } from '../composables/useFrappeApi'
 import { showToast, openConfirm } from '../composables/useKeyboardEngine'
+import { printFormattedHtml } from '../composables/useExport'
 import MenuPanel from '../components/common/MenuPanel.vue'
 import LedgerDropdown from '../components/common/LedgerDropdown.vue'
 
 const route = useRoute()
 const router = useRouter()
-const { bootState, searchLedgers, saveVoucher } = useFrappeApi()
+const { bootState, searchLedgers, saveVoucher, getVoucherDetails } = useFrappeApi()
 
 const voucherType = computed(() => route.params.type || 'purchase')
+const voucherId = computed(() => route.query.id || '')
+const isReadOnly = computed(() => !!voucherId.value)
 const defaultCompany = computed(() => bootState.default_company || 'Rajendra Narahari Lokhande')
 
 const VOUCHER_CONFIGS = {
-  purchase: { title: 'Sugar Purchase Voucher (F9)', doctype: 'Sugar Purchase' },
-  dispatch: { title: 'Dispatch Entry Voucher (F8)', doctype: 'Dispatch Entry' },
-  payment: { title: 'Purchase Payment Voucher (F5)', doctype: 'Purchase Payment' },
-  receipt: { title: 'Broker Party Payment (Receipt) (F6)', doctype: 'Broker Party Payment' },
-  contra: { title: 'Contra / Bank Transfer (F4)', doctype: 'Account' },
+  purchase: { title: 'Sugar Purchase Voucher (F9)', doctype: 'Sugar Purchase', registerRoute: '/register/purchase' },
+  dispatch: { title: 'Dispatch Entry Voucher (F8)', doctype: 'Dispatch Entry', registerRoute: '/register/dispatch' },
+  payment: { title: 'Purchase Payment Voucher (F5)', doctype: 'Purchase Payment', registerRoute: '/register/payment' },
+  receipt: { title: 'Broker Party Payment (Receipt) (F6)', doctype: 'Broker Party Payment', registerRoute: '/register/receipt' },
+  contra: { title: 'Contra / Bank Transfer (F4)', doctype: 'Account', registerRoute: '/register/purchase' },
 }
 
 const currentConfig = computed(() => VOUCHER_CONFIGS[voucherType.value] || VOUCHER_CONFIGS.purchase)
 
 // Form State
 const selectedPurchaseLot = ref(null)
-const selectedPurchasePaymentLot = ref(null)
-const selectedDispatchEntry = ref(null)
+const activeDropdownField = ref(null)
+const dropdownMatches = ref([])
+const dropdownIndex = ref(0)
+let searchTimer = null
 
 const form = reactive({
   date: new Date().toISOString().split('T')[0],
@@ -732,12 +758,15 @@ const grandTotal = computed(() => {
   } else if (voucherType.value === 'payment' || voucherType.value === 'receipt') {
     base = form.paid_amount || 0
   }
-  const additional = form.additional_rows.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
-  return base + additional
+  return base
 })
 
 const formatCurrency = (val) => {
   return Number(val || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+const formatNumber = (val) => {
+  return Number(val || 0).toLocaleString('en-IN')
 }
 
 // Side Menu Items
@@ -750,100 +779,255 @@ const voucherMenuItems = [
   { key: 'L', label: 'Purchase List', route: '/register/purchase' },
   { key: 'K', label: 'Dispatch List', route: '/register/dispatch' },
   { key: 'B', label: 'Day Book (F10)', route: '/daybook' },
+  { key: 'Esc', label: 'Gateway Menu', route: '/' },
 ]
 
 const activeVoucherIndex = computed(() => {
-  const map = { contra: 0, payment: 1, receipt: 2, dispatch: 3, purchase: 4 }
-  return map[voucherType.value] ?? 4
+  return voucherMenuItems.findIndex(m => m.route === `/voucher/${voucherType.value}`)
 })
 
 const handleVoucherSelect = (idx) => {
   router.push(voucherMenuItems[idx].route)
 }
 
-// Dropdown Autocomplete
-const activeDropdownField = ref(null)
-const dropdownMatches = ref([])
-const dropdownIndex = ref(0)
-let searchDebounce = null
+// -------------------------------------------------------------
+// LOAD EXISTING VOUCHER DETAILS FOR READ-ONLY VIEW
+// -------------------------------------------------------------
+const loadVoucherData = async () => {
+  if (!voucherId.value) return
 
-const onLedgerFocus = async (fieldName, doctype) => {
-  activeDropdownField.value = fieldName
-  dropdownIndex.value = 0
-  let query = ''
-  if (fieldName.startsWith('row-')) {
-    const idx = parseInt(fieldName.split('-')[1])
-    query = form.additional_rows[idx]?.ledger || ''
-  } else {
-    query = form[fieldName] || ''
+  try {
+    const doc = await getVoucherDetails(currentConfig.value.doctype, voucherId.value)
+    if (doc) {
+      if (voucherType.value === 'purchase') {
+        form.date = doc.purchase_date || doc.date || form.date
+        form.supplier = doc.supplier || ''
+        form.item = doc.item || 'S-30'
+        form.purchase_qty_quintal = doc.purchase_qty_quintal || 0
+        form.purchase_rate = doc.purchase_rate || 0
+        form.total_amount = doc.total_amount || 0
+        form.narration = doc.narration || doc.remarks || ''
+      } else if (voucherType.value === 'dispatch') {
+        form.date = doc.dispatch_date || doc.date || form.date
+        form.sugar_purchase = doc.sugar_purchase || ''
+        form.customer_name = doc.customer_name || doc.customer || ''
+        form.broker = doc.broker || ''
+        form.vehicle_no = doc.vehicle_no || ''
+        form.item = doc.item || 'S-30'
+        form.dispatch_qty_quintal = doc.dispatch_qty_quintal || 0
+        form.rate = doc.rate || 0
+        form.total_amount = doc.total_amount || 0
+        form.narration = doc.narration || ''
+      } else if (voucherType.value === 'payment') {
+        form.date = doc.payment_date || doc.date || form.date
+        form.sugar_purchase = doc.sugar_purchase || ''
+        form.supplier = doc.supplier || ''
+        form.bank_account = doc.bank_account || doc.paid_from || ''
+        form.payment_mode = doc.mode_of_payment || 'RTGS'
+        form.utr_no = doc.reference_no || ''
+        form.paid_amount = doc.paid_amount || 0
+        form.narration = doc.narration || ''
+      } else if (voucherType.value === 'receipt') {
+        form.date = doc.receipt_date || doc.date || form.date
+        form.dispatch_entry = doc.dispatch_entry || ''
+        form.customer_name = doc.customer_name || doc.customer || ''
+        form.broker = doc.broker || ''
+        form.bank_account = doc.bank_account || doc.paid_to || ''
+        form.payment_mode = doc.mode_of_payment || 'Bank'
+        form.utr_no = doc.reference_no || ''
+        form.paid_amount = doc.received_amount || 0
+        form.narration = doc.narration || ''
+      }
+      showToast(`Viewing ${voucherId.value} (Read-Only)`)
+    }
+  } catch (e) {
+    showToast(`Failed to load voucher: ${e.message}`)
   }
-  const matches = await searchLedgers(query, doctype)
-  dropdownMatches.value = matches
+}
+
+const createNewVoucher = () => {
+  router.push({ path: `/voucher/${voucherType.value}`, query: {} })
+}
+
+// -------------------------------------------------------------
+// PRINT SINGLE VOUCHER
+// -------------------------------------------------------------
+const printSingleVoucher = () => {
+  let detailsHtml = ''
+
+  if (voucherType.value === 'purchase') {
+    detailsHtml = `
+      <table style="width: 100%; border-collapse: collapse; margin-top: 14px;">
+        <thead>
+          <tr>
+            <th>Item / Sugar Grade</th>
+            <th class="text-right">Quantity (Quintals)</th>
+            <th class="text-right">Rate (₹/Qtl)</th>
+            <th class="text-right">Total Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="font-bold">${form.item}</td>
+            <td class="text-right font-mono">${formatNumber(form.purchase_qty_quintal)} Qtl</td>
+            <td class="text-right font-mono">₹${formatNumber(form.purchase_rate)}</td>
+            <td class="text-right font-mono font-bold">₹${formatCurrency(form.total_amount)}</td>
+          </tr>
+        </tbody>
+      </table>
+    `
+  } else if (voucherType.value === 'dispatch') {
+    detailsHtml = `
+      <table style="width: 100%; border-collapse: collapse; margin-top: 14px;">
+        <thead>
+          <tr>
+            <th>Grade Item</th>
+            <th>Vehicle No</th>
+            <th>Broker</th>
+            <th class="text-right">Quantity (Qtl)</th>
+            <th class="text-right">Rate (₹)</th>
+            <th class="text-right">Total Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="font-bold">${form.item}</td>
+            <td>${form.vehicle_no || '—'}</td>
+            <td>${form.broker || '—'}</td>
+            <td class="text-right font-mono">${formatNumber(form.dispatch_qty_quintal)} Qtl</td>
+            <td class="text-right font-mono">₹${formatNumber(form.rate)}</td>
+            <td class="text-right font-mono font-bold">₹${formatCurrency(form.total_amount)}</td>
+          </tr>
+        </tbody>
+      </table>
+    `
+  } else {
+    detailsHtml = `
+      <table style="width: 100%; border-collapse: collapse; margin-top: 14px;">
+        <thead>
+          <tr>
+            <th>Payment Mode</th>
+            <th>UTR / Reference No</th>
+            <th>Account</th>
+            <th class="text-right">Total Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="font-bold">${form.payment_mode}</td>
+            <td>${form.utr_no || '—'}</td>
+            <td>${form.bank_account || '—'}</td>
+            <td class="text-right font-mono font-bold">₹${formatCurrency(form.paid_amount)}</td>
+          </tr>
+        </tbody>
+      </table>
+    `
+  }
+
+  const html = `
+    <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px 16px; margin-bottom: 14px;">
+      <div style="display: flex; justify-content: space-between; font-size: 13px;">
+        <div>
+          <strong>Voucher ID:</strong> <span class="font-mono font-bold">${voucherId.value || 'NEW'}</span><br>
+          <strong>Party:</strong> ${form.supplier || form.customer_name || '—'}
+        </div>
+        <div style="text-align: right;">
+          <strong>Date:</strong> ${form.date}<br>
+          <strong>Company:</strong> ${defaultCompany.value}
+        </div>
+      </div>
+    </div>
+
+    ${detailsHtml}
+
+    <div style="margin-top: 14px; padding: 10px; background: #f8fafc; border-radius: 4px; font-size: 12px;">
+      <strong>Narration:</strong> ${form.narration || 'No notes provided.'}
+    </div>
+  `
+
+  printFormattedHtml(`${currentConfig.value.title} — ${voucherId.value || 'Voucher'}`, html, defaultCompany.value)
+}
+
+// -------------------------------------------------------------
+// TYPEAHEAD & DROPDOWN HANDLING (DISABLED IN READ-ONLY)
+// -------------------------------------------------------------
+const onLedgerFocus = (fieldName, doctype) => {
+  if (isReadOnly.value) return
+  activeDropdownField.value = fieldName
+  searchLedgersList('', doctype)
 }
 
 const onLedgerInput = (fieldName, doctype) => {
-  clearTimeout(searchDebounce)
-  searchDebounce = setTimeout(async () => {
-    let q = ''
-    if (fieldName.startsWith('row-')) {
-      const idx = parseInt(fieldName.split('-')[1])
-      q = form.additional_rows[idx]?.ledger || ''
-    } else {
-      q = form[fieldName] || ''
-    }
-    const matches = await searchLedgers(q, doctype)
-    dropdownMatches.value = matches
-    dropdownIndex.value = 0
-  }, 80)
+  if (isReadOnly.value) return
+  activeDropdownField.value = fieldName
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    const q = form[fieldName] || ''
+    searchLedgersList(q, doctype)
+  }, 100)
 }
 
-const selectDropdownMatch = (match) => {
-  const fieldName = activeDropdownField.value
-  if (!fieldName) return
+const searchLedgersList = async (q, doctype) => {
+  if (isReadOnly.value) return
+  const matches = await searchLedgers(q, doctype)
+  dropdownMatches.value = matches
+  dropdownIndex.value = 0
+}
 
-  if (fieldName.startsWith('row-')) {
-    const idx = parseInt(fieldName.split('-')[1])
-    form.additional_rows[idx].ledger = match.name
-  } else {
-    form[fieldName] = match.name
-    if (fieldName === 'sugar_purchase' && match.details) {
-      selectedPurchaseLot.value = match.details
-      selectedPurchasePaymentLot.value = match.details
-      if (match.details.item) form.item = match.details.item
-      if (match.details.supplier) form.supplier = match.details.supplier
-      if (voucherType.value === 'payment') {
-        if (match.details.total_amount) form.total_amount = match.details.total_amount
-        if (match.details.total_amount) form.paid_amount = match.details.total_amount
-      }
-    } else if (fieldName === 'dispatch_entry' && match.details) {
-      selectedDispatchEntry.value = match.details
-      if (match.details.customer_name) form.customer = match.details.customer_name
-      if (match.details.broker) form.broker = match.details.broker
-      if (match.details.balance_amount !== undefined) form.paid_amount = match.details.balance_amount
+const selectDropdownMatch = (item) => {
+  if (isReadOnly.value || !item) return
+  const fieldName = activeDropdownField.value
+
+  if (fieldName === 'supplier') {
+    form.supplier = item.name
+  } else if (fieldName === 'item') {
+    form.item = item.name
+  } else if (fieldName === 'customer_name') {
+    form.customer = item.name
+    form.customer_name = item.label || item.name
+  } else if (fieldName === 'broker') {
+    form.broker = item.name
+  } else if (fieldName === 'sugar_purchase' || fieldName === 'sugar_purchase_pay') {
+    form.sugar_purchase = item.name
+    if (item.supplier) form.supplier = item.supplier
+    if (item.item) form.item = item.item
+    if (item.available_qty_quintal !== undefined) {
+      selectedPurchaseLot.value = item
     }
+    if (fieldName === 'sugar_purchase_pay' && item.total_amount) {
+      form.paid_amount = item.total_amount
+    }
+  } else if (fieldName === 'dispatch_entry') {
+    form.dispatch_entry = item.name
+    if (item.customer) {
+      form.customer = item.customer
+      form.customer_name = item.customer_name || item.customer
+    }
+    if (item.broker) form.broker = item.broker
+    if (item.balance_amount !== undefined) form.paid_amount = item.balance_amount
+  } else if (fieldName === 'bank_account') {
+    form.bank_account = item.name
   }
 
   activeDropdownField.value = null
-  dropdownMatches.value = []
   advanceFieldFrom(fieldName)
 }
 
-// Field sequence
-const rowRefs = reactive({})
-const setRowRef = (el, idx, key) => {
-  if (!rowRefs[idx]) rowRefs[idx] = {}
-  rowRefs[idx][key] = el
-}
-
+// -------------------------------------------------------------
+// FIELD KEYDOWN NAVIGATION
+// -------------------------------------------------------------
 const getFieldSequence = () => {
   if (voucherType.value === 'purchase') {
     return ['date', 'supplier', 'item', 'qty', 'rate', 'narration']
-  } else if (voucherType.value === 'dispatch') {
+  }
+  if (voucherType.value === 'dispatch') {
     return ['date', 'sugar_purchase', 'customer_name', 'broker', 'vehicle_no', 'item', 'qty', 'rate', 'narration']
-  } else if (voucherType.value === 'payment') {
-    return ['date', 'sugar_purchase', 'bank_account', 'supplier', 'payment_mode', 'utr_no', 'paid_amount', 'narration']
-  } else if (voucherType.value === 'receipt') {
-    return ['date', 'dispatch_entry', 'bank_account', 'customer', 'payment_mode', 'utr_no', 'paid_amount', 'narration']
+  }
+  if (voucherType.value === 'payment') {
+    return ['date', 'sugar_purchase_pay', 'supplier', 'bank_account', 'payment_mode', 'utr_no', 'paid_amount', 'narration']
+  }
+  if (voucherType.value === 'receipt') {
+    return ['date', 'dispatch_entry', 'customer_name', 'broker', 'bank_account', 'utr_no', 'paid_amount', 'narration']
   }
   return ['date', 'narration']
 }
@@ -865,17 +1049,18 @@ const retreatFieldFrom = (currentField) => {
     const prevField = seq[idx - 1]
     const el = document.querySelector(`[data-field="${prevField}"]`)
     if (el) el.focus()
-  } else {
-    openConfirm(
-      'Quit Voucher?',
-      'Discard current voucher and return to Gateway?',
-      () => router.push('/'),
-      () => {}
-    )
   }
 }
 
 const handleFieldKeyDown = (e, fieldName) => {
+  if (isReadOnly.value) {
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      router.push(currentConfig.value.registerRoute || '/register/purchase')
+    }
+    return
+  }
+
   if (activeDropdownField.value === fieldName && dropdownMatches.value.length) {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
@@ -892,13 +1077,10 @@ const handleFieldKeyDown = (e, fieldName) => {
     }
   }
 
-  if (e.key === 'Enter' || (e.key === 'Tab' && !e.shiftKey)) {
+  if (e.key === 'Enter') {
     e.preventDefault()
     activeDropdownField.value = null
     advanceFieldFrom(fieldName)
-  } else if (e.key === 'Tab' && e.shiftKey) {
-    e.preventDefault()
-    retreatFieldFrom(fieldName)
   } else if (e.key === 'Escape') {
     e.preventDefault()
     if (activeDropdownField.value) {
@@ -913,51 +1095,15 @@ const handleFieldKeyDown = (e, fieldName) => {
   }
 }
 
-const handleRowKeyDown = (e, idx, col) => {
-  if (col === 'ledger' && activeDropdownField.value === `row-${idx}-ledger` && dropdownMatches.value.length) {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      dropdownIndex.value = (dropdownIndex.value + 1) % dropdownMatches.value.length
-      return
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      dropdownIndex.value = (dropdownIndex.value - 1 + dropdownMatches.value.length) % dropdownMatches.value.length
-      return
-    } else if (e.key === 'Enter') {
-      e.preventDefault()
-      selectDropdownMatch(dropdownMatches.value[dropdownIndex.value])
-      return
-    }
-  }
-
-  if (e.key === 'Enter') {
-    e.preventDefault()
-    activeDropdownField.value = null
-    if (col === 'ledger') {
-      if (rowRefs[idx]?.amount) rowRefs[idx].amount.focus()
-    } else if (col === 'amount') {
-      if (idx === form.additional_rows.length - 1 && form.additional_rows[idx].amount) {
-        form.additional_rows.push({ ledger: '', amount: '' })
-        nextTick(() => {
-          if (rowRefs[idx + 1]?.ledger) rowRefs[idx + 1].ledger.focus()
-        })
-      } else {
-        const el = document.querySelector('[data-field="narration"]')
-        if (el) el.focus()
-      }
-    }
-  } else if (e.key === 'Escape') {
-    e.preventDefault()
-    if (activeDropdownField.value) {
-      activeDropdownField.value = null
-      return
-    }
-    const el = document.querySelector('[data-field="narration"]')
-    if (el) el.focus()
-  }
-}
-
 const handleNarrationKeyDown = (e) => {
+  if (isReadOnly.value) {
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      router.push(currentConfig.value.registerRoute || '/register/purchase')
+    }
+    return
+  }
+
   if (e.key === 'Enter') {
     e.preventDefault()
     promptAcceptVoucher()
@@ -968,6 +1114,8 @@ const handleNarrationKeyDown = (e) => {
 }
 
 const promptAcceptVoucher = () => {
+  if (isReadOnly.value) return
+
   const title = `Accept ${currentConfig.value.title}?`
   const party = form.supplier || form.customer_name || form.customer || form.bank_account || 'Ledger'
   const totalStr = formatCurrency(grandTotal.value)
@@ -985,7 +1133,7 @@ const promptAcceptVoucher = () => {
         }, 1)
 
         showToast(`✅ ${res.message || 'Saved successfully'}`)
-        router.push('/daybook')
+        router.push(currentConfig.value.registerRoute || '/daybook')
       } catch (err) {
         showToast(`⚠️ Save error: ${err.message}`)
       }
@@ -997,14 +1145,102 @@ const promptAcceptVoucher = () => {
   )
 }
 
+watch([() => route.params.type, () => route.query.id], () => {
+  if (voucherId.value) {
+    loadVoucherData()
+  } else {
+    // Reset form for fresh voucher entry
+    form.supplier = ''
+    form.customer = ''
+    form.customer_name = ''
+    form.broker = ''
+    form.sugar_purchase = ''
+    form.dispatch_entry = ''
+    form.vehicle_no = ''
+    form.narration = ''
+    selectedPurchaseLot.value = null
+  }
+})
+
 onMounted(() => {
   calcPurchaseTotal()
   calcDispatchTotal()
-  nextTick(() => {
-    const seq = getFieldSequence()
-    const firstField = seq[1] || 'date'
-    const el = document.querySelector(`[data-field="${firstField}"]`)
-    if (el) el.focus()
-  })
+  if (voucherId.value) {
+    loadVoucherData()
+  } else {
+    nextTick(() => {
+      const seq = getFieldSequence()
+      const firstField = seq[1] || 'date'
+      const el = document.querySelector(`[data-field="${firstField}"]`)
+      if (el) el.focus()
+    })
+  }
 })
 </script>
+
+<style scoped>
+.btn-header-tool {
+  padding: 6px 12px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.btn-header-tool:hover {
+  background: var(--panel-soft);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.btn-save-voucher {
+  padding: 8px 18px;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.btn-save-voucher:hover {
+  background: #1d4ed8;
+}
+
+.readonly-status {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.readonly-row input,
+.readonly-row textarea {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  border-color: var(--line) !important;
+  cursor: default !important;
+  font-weight: 600 !important;
+}
+
+.readonly-row input:focus,
+.readonly-row textarea:focus {
+  border-color: var(--line) !important;
+  box-shadow: none !important;
+}
+</style>

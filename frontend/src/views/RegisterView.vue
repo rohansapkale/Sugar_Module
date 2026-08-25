@@ -598,8 +598,17 @@ const openNewEntry = () => {
 }
 
 const openVoucher = (row) => {
-  showToast(`Opening voucher ${row.name}`)
-  openNewEntry()
+  if (!row || !row.name) return
+  showToast(`Opening ${row.name} (View Mode)`)
+  if (registerType.value === 'purchase') {
+    router.push({ path: '/voucher/purchase', query: { id: row.name } })
+  } else if (registerType.value === 'dispatch') {
+    router.push({ path: '/voucher/dispatch', query: { id: row.name } })
+  } else if (registerType.value === 'payment') {
+    router.push({ path: '/voucher/payment', query: { id: row.name } })
+  } else if (registerType.value === 'receipt') {
+    router.push({ path: '/voucher/receipt', query: { id: row.name } })
+  }
 }
 
 // -------------------------------------------------------------
