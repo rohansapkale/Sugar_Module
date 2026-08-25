@@ -1,12 +1,35 @@
 <template>
   <div id="main-layout">
     <div id="content-area">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-        <div class="v-title" style="margin-bottom: 0;">
-          Day Book &amp; Audit Register — {{ activeFilterLabel }}
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <div class="v-title" style="margin-bottom: 0;">
+            Day Book &amp; Audit Register — {{ activeFilterLabel }}
+          </div>
+          <div style="font-size: 12.5px; color: var(--muted);">Live chronological journal audit stream across all voucher entries</div>
         </div>
-        <div style="font-size: 13px; color: var(--muted);">
-          Total Records: <strong style="color: var(--navy);">{{ entries.length }}</strong>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <div style="font-size: 13px; color: var(--muted); margin-right: 6px;">
+            Total Records: <strong style="color: var(--navy);">{{ entries.length }}</strong>
+          </div>
+
+          <!-- Print Day Book Button -->
+          <button
+            class="btn-tool"
+            title="Print Formatted Day Book"
+            @click="printDayBook"
+          >
+            <span>🖨️</span> Print Day Book
+          </button>
+
+          <!-- Export Day Book CSV Button -->
+          <button
+            class="btn-tool"
+            title="Export Day Book to CSV"
+            @click="exportDayBookCSV"
+          >
+            <span>📥</span> Export CSV
+          </button>
         </div>
       </div>
 
@@ -79,14 +102,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useFrappeApi } from '../composables/useFrappeApi'
 import { globalUiState, showToast } from '../composables/useKeyboardEngine'
+import { downloadCSV, printFormattedHtml } from '../composables/useExport'
 import MenuPanel from '../components/common/MenuPanel.vue'
 
 const router = useRouter()
-const { getDayBook } = useFrappeApi()
+const { getDayBook, bootState } = useFrappeApi()
 
 const entries = ref([])
 const activeRowIndex = ref(0)
@@ -127,6 +151,83 @@ const openVoucher = (row) => {
   else router.push('/voucher/purchase')
 }
 
+// -------------------------------------------------------------
+// PRINT & CSV EXPORT FOR DAY BOOK
+// -------------------------------------------------------------
+const printDayBook = () => {
+  let totalDebit = 0
+  let totalCredit = 0
+
+  const rowsHtml = entries.value.map((r) => {
+    totalDebit += Number(r.debit || 0)
+    totalCredit += Number(r.credit || 0)
+    return `
+      <tr>
+        <td class="font-mono">${r.date}</td>
+        <td class="font-bold">${r.voucher_type}</td>
+        <td class="font-bold">${r.particulars}</td>
+        <td>${r.details || '—'}</td>
+        <td class="text-right font-mono val-green">${r.debit ? '₹' + formatCurrency(r.debit) : '—'}</td>
+        <td class="text-right font-mono val-red">${r.credit ? '₹' + formatCurrency(r.credit) : '—'}</td>
+        <td class="text-center font-bold">${r.status || 'Draft'}</td>
+      </tr>
+    `
+  }).join('')
+
+  const html = `
+    <div style="margin-bottom: 12px; font-size: 13px; color: #475569;">
+      <strong>Filter Scope:</strong> ${activeFilterLabel.value} · <strong>Total Records:</strong> ${entries.value.length}
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 12%;">Date</th>
+          <th style="width: 18%;">Voucher Type</th>
+          <th style="width: 24%;">Account / Party</th>
+          <th style="width: 20%;">Details / Narration</th>
+          <th style="width: 13%; text-align: right;">Debit (₹)</th>
+          <th style="width: 13%; text-align: right;">Credit (₹)</th>
+          <th style="width: 10%; text-align: center;">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml || '<tr><td colspan="7" class="text-center">No transactions recorded</td></tr>'}
+      </tbody>
+      <tfoot>
+        <tr style="background: #f1f5f9; font-weight: bold;">
+          <td colspan="4" class="text-right">TOTAL TRANSACTION TURNOVER:</td>
+          <td class="text-right font-mono val-green">₹${formatCurrency(totalDebit)}</td>
+          <td class="text-right font-mono val-red">₹${formatCurrency(totalCredit)}</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  `
+  printFormattedHtml(`Day Book & Audit Register (${activeFilterLabel.value})`, html, bootState.default_company || 'Mahalaxmi Sugar Mills Pvt. Ltd.')
+}
+
+const exportDayBookCSV = () => {
+  const headers = ['Date', 'Voucher Type', 'Particulars / Account', 'Details / Narration', 'Debit (INR)', 'Credit (INR)', 'Status']
+  const rows = [headers]
+  let totalDebit = 0
+  let totalCredit = 0
+
+  entries.value.forEach((r) => {
+    const d = Number(r.debit || 0)
+    const c = Number(r.credit || 0)
+    totalDebit += d
+    totalCredit += c
+    rows.push([r.date, r.voucher_type, r.particulars, r.details || '', d, c, r.status || 'Draft'])
+  })
+
+  rows.push([])
+  rows.push(['TOTALS', '', '', '', totalDebit, totalCredit, ''])
+
+  const dateStr = new Date().toISOString().slice(0, 10)
+  downloadCSV(`Day_Book_${dateStr}.csv`, rows)
+  showToast('Exported Day Book to CSV')
+}
+
 const daybookMenuItems = [
   { key: 'F2', label: 'Filter by Date', action: () => { globalUiState.isDateModalOpen.value = true } },
   { key: 'F4', label: 'Filter by Type', action: () => toggleTypeFilter() },
@@ -134,6 +235,8 @@ const daybookMenuItems = [
   { key: 'P', label: 'New Purchase (F9)', action: () => router.push('/voucher/purchase') },
   { key: 'D', label: 'New Dispatch (F8)', action: () => router.push('/voucher/dispatch') },
   { key: 'Y', label: 'New Payment (F5)', action: () => router.push('/voucher/payment') },
+  { key: 'F7', label: 'Print Day Book', action: () => printDayBook() },
+  { key: 'E', label: 'Export to CSV', action: () => exportDayBookCSV() },
   { key: 'Esc', label: 'Gateway Menu', action: () => router.push('/') },
 ]
 
@@ -190,3 +293,27 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
 })
 </script>
+
+<style scoped>
+.btn-tool {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.btn-tool:hover {
+  background: var(--panel-soft);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+</style>
