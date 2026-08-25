@@ -68,9 +68,9 @@ const openGoTo = () => {
 
 const goToErpNext = () => {
   if (window.location.port === '8080') {
-    window.location.href = `http://${window.location.hostname}:8001/app`
+    window.location.href = `http://${window.location.hostname}:8001/desk/rajendra-narahari-lokhande`
   } else {
-    window.location.href = '/app'
+    window.location.href = '/desk/rajendra-narahari-lokhande'
   }
 }
 </script>

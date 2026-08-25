@@ -57,7 +57,7 @@ const MENU_COMMANDS = [
   { title: 'Day Book & Transaction Audit Register', route: '/daybook', shortcut: 'F10', category: 'Report' },
   { title: 'Gateway of Sugar Module', route: '/', shortcut: 'Esc', category: 'Navigation' },
   { title: 'Masters Directory (Suppliers, Customers, Brokers, Items)', route: '/masters', shortcut: 'M', category: 'Masters' },
-  { title: 'getMyErp (ERPNext Desk)', externalUrl: '/app', shortcut: 'getMyErp', category: 'System' },
+  { title: 'getMyErp (ERPNext Desk)', externalUrl: '/desk/rajendra-narahari-lokhande', shortcut: 'getMyErp', category: 'System' },
 ]
 
 const filteredItems = computed(() => {
