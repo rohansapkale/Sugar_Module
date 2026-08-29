@@ -14,7 +14,6 @@
           </div>
           <div>
             <h1 class="gateway-main-title">Gateway of Sugar</h1>
-            <div class="gateway-subtitle">Tally-style ERP wrapper for Sugar Trading Business</div>
           </div>
         </div>
 
