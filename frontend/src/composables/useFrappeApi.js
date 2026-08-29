@@ -208,6 +208,19 @@ export function useFrappeApi() {
     return null
   }
 
+  const getGatewayMetrics = async (period = 'Today') => {
+    try {
+      const res = await fetch(`/api/method/sugar_module.sugar_module.api.get_gateway_metrics?period=${encodeURIComponent(period)}`)
+      if (res.ok) {
+        const data = await res.json()
+        return data.message || data
+      }
+    } catch (e) {
+      console.error('[FrappeApi] getGatewayMetrics error:', e)
+    }
+    return null
+  }
+
   return {
     bootState,
     isOnline,
@@ -219,5 +232,6 @@ export function useFrappeApi() {
     getDayBook,
     getVoucherDetails,
     getMastersSummary,
+    getGatewayMetrics,
   }
 }
