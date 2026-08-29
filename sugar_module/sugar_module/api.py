@@ -960,12 +960,16 @@ def get_masters_summary(**kwargs):
 @frappe.whitelist(methods=["GET", "POST"], allow_guest=True)
 def get_gateway_metrics(period="Today", **kwargs):
     """
-    Returns live trading, stock, and financial summary metrics for Gateway of Sugar dashboard
+    Returns 100% live real database metrics from Frappe sugar_module:
+    - Sugar Purchase (Purchases, Stock, Payables)
+    - Dispatch Entry (Sales, Dispatches, Receivables)
+    - Purchase Payment (Disbursements Made)
+    - Broker Party Payment (Collections Received)
     """
     period = period or "Today"
-    today = nowdate()
+    today = str(nowdate())
 
-    # 1. Purchases
+    # 1. Real Purchases Data
     purchases = frappe.get_all(
         "Sugar Purchase",
         fields=["purchase_qty_quintal", "total_amount", "available_qty_quintal", "purchase_date"],
@@ -975,10 +979,10 @@ def get_gateway_metrics(period="Today", **kwargs):
     total_purchase_val = sum(flt(p.get("total_amount")) for p in purchases)
     closing_stock_qty = sum(flt(p.get("available_qty_quintal")) for p in purchases)
 
-    today_purchases = [p for p in purchases if str(p.get("purchase_date") or "") == str(today)]
-    today_purchase_qty = sum(flt(p.get("purchase_qty_quintal")) for p in today_purchases) if today_purchases else (total_purchase_qty or 2450)
+    today_purchases = [p for p in purchases if str(p.get("purchase_date") or "") == today]
+    today_purchase_qty = sum(flt(p.get("purchase_qty_quintal")) for p in today_purchases)
 
-    # 2. Sales / Dispatches
+    # 2. Real Sales / Dispatches Data
     dispatches = frappe.get_all(
         "Dispatch Entry",
         fields=["dispatch_qty_quintal", "total_amount", "paid_amount", "balance_amount", "dispatch_date"],
@@ -988,7 +992,10 @@ def get_gateway_metrics(period="Today", **kwargs):
     total_sales_val = sum(flt(d.get("total_amount")) for d in dispatches)
     total_receivable = sum(flt(d.get("balance_amount")) for d in dispatches)
 
-    # 3. Payments Made
+    today_dispatches = [d for d in dispatches if str(d.get("dispatch_date") or "") == today]
+    today_sales_qty = sum(flt(d.get("dispatch_qty_quintal")) for d in today_dispatches)
+
+    # 3. Real Payments Made (Disbursements to Sugar Mills)
     payments = frappe.get_all(
         "Purchase Payment",
         fields=["paid_amount", "payment_date"],
@@ -996,31 +1003,35 @@ def get_gateway_metrics(period="Today", **kwargs):
     )
     total_payments_made = sum(flt(p.get("paid_amount")) for p in payments)
 
-    # 4. Payments Received
+    # 4. Real Payments Received (Collections from Buyers / Brokers)
     receipts = frappe.get_all(
         "Broker Party Payment",
-        fields=["received_amount", "receipt_date"],
+        fields=["paid_amount", "payment_date"],
         ignore_permissions=True
     )
-    total_payments_received = sum(flt(r.get("received_amount")) for r in receipts)
+    total_payments_received = sum(flt(r.get("paid_amount")) for r in receipts)
 
-    # 5. Payables
+    # 5. Real Payables Due to Sugar Mills
     total_payable = max(0.0, total_purchase_val - total_payments_made)
 
-    # Base opening stock fallback
-    opening_stock = max(0.0, (closing_stock_qty + total_sales_qty) - total_purchase_qty) if (total_purchase_qty or total_sales_qty) else 2000.0
+    # 6. Real Opening Stock Calculation (Balance Before Current Cycle)
+    opening_stock = max(0.0, (closing_stock_qty + total_sales_qty) - total_purchase_qty)
+
+    # Period-sensitive purchase qty display
+    display_purchase_qty = today_purchase_qty if period == "Today" else total_purchase_qty
+    display_sales_qty = today_sales_qty if period == "Today" and today_sales_qty else total_sales_qty
 
     return {
         "period": period,
-        "opening_stock": round(opening_stock or 2000.0, 2),
-        "today_purchases_qty": round(today_purchase_qty or total_purchase_qty or 2450.0, 2),
-        "total_sales_qty": round(total_sales_qty or 1980.0, 2),
-        "closing_stock": round(closing_stock_qty or 2470.0, 2),
-        "total_purchases_val": round(total_purchase_val or 9240000.0, 2),
-        "total_sales_val": round(total_sales_val or 7830000.0, 2),
-        "payments_received": round(total_payments_received or 1870000.0, 2),
-        "payments_made": round(total_payments_made or 975000.0, 2),
-        "total_receivable": round(total_receivable or 16500000.0, 2),
-        "total_payable": round(total_payable or 8240000.0, 2),
+        "opening_stock": round(opening_stock, 2),
+        "today_purchases_qty": round(display_purchase_qty, 2),
+        "total_sales_qty": round(display_sales_qty, 2),
+        "closing_stock": round(closing_stock_qty, 2),
+        "total_purchases_val": round(total_purchase_val, 2),
+        "total_sales_val": round(total_sales_val, 2),
+        "payments_received": round(total_payments_received, 2),
+        "payments_made": round(total_payments_made, 2),
+        "total_receivable": round(total_receivable, 2),
+        "total_payable": round(total_payable, 2),
     }
 

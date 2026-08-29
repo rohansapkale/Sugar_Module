@@ -267,16 +267,16 @@ const activePeriod = ref('Today')
 const activeIndex = ref(0)
 
 const metrics = reactive({
-  opening_stock: 2000,
-  today_purchases_qty: 2450,
-  total_sales_qty: 1980,
-  closing_stock: 2470,
-  total_purchases_val: 9240000,
-  total_sales_val: 7830000,
-  payments_received: 1870000,
-  payments_made: 975000,
-  total_receivable: 16500000,
-  total_payable: 8240000,
+  opening_stock: 0,
+  today_purchases_qty: 0,
+  total_sales_qty: 0,
+  closing_stock: 0,
+  total_purchases_val: 0,
+  total_sales_val: 0,
+  payments_received: 0,
+  payments_made: 0,
+  total_receivable: 0,
+  total_payable: 0,
 })
 
 const formatNumber = (val) => {
