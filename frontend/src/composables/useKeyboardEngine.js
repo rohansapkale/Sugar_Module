@@ -85,8 +85,9 @@ function initGlobalKeyboardListener() {
   isGlobalListenerAttached = true
 
   window.addEventListener('keydown', (e) => {
-    // Ignore keypresses inside input/textarea/select unless it's an overlay trigger
-    const inInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)
+    const targetTag = (e.target?.tagName || '').toUpperCase()
+    const activeTag = (document.activeElement?.tagName || '').toUpperCase()
+    const inInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(targetTag) || ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeTag)
 
     // 1. Alt+G / Alt+g / Ctrl+G / Ctrl+K -> Toggle Go To Command Palette
     const isGKey = e.key === 'g' || e.key === 'G' || e.code === 'KeyG'
@@ -130,6 +131,11 @@ function initGlobalKeyboardListener() {
       return
     }
 
+    // If currently typing in ANY input or search bar, do NOT intercept keystrokes!
+    if (inInput) {
+      return
+    }
+
     // 5. Function Keys F1-F12
     if (e.key.startsWith('F') && /^F([1-9]|1[0-2])$/.test(e.key)) {
       e.preventDefault()
@@ -140,9 +146,6 @@ function initGlobalKeyboardListener() {
     // 6. Global Escape Navigation Handler (returns to Gateway)
     if (e.key === 'Escape') {
       e.preventDefault()
-      if (document.activeElement && inInput) {
-        document.activeElement.blur()
-      }
       if (router && router.currentRoute.value.path !== '/') {
         router.push('/')
       }
@@ -150,7 +153,7 @@ function initGlobalKeyboardListener() {
     }
 
     // 7. Navigation Hotkeys outside inputs (M = Masters, V = Vouchers, R = Reports / Receipt)
-    if (!inInput && !e.altKey && !e.ctrlKey && !e.metaKey) {
+    if (!e.altKey && !e.ctrlKey && !e.metaKey) {
       const key = e.key.toUpperCase()
 
       // Category Switching
@@ -199,7 +202,7 @@ function initGlobalKeyboardListener() {
         return
       }
     }
-  }, { capture: true })
+  })
 }
 
 // Auto-initialize singleton listener

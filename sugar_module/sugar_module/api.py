@@ -278,7 +278,6 @@ def universal_global_search(query=None, limit=25, **kwargs):
             "name": ["like", f"%{q}%"],
             "supplier": ["like", f"%{q}%"],
             "item": ["like", f"%{q}%"],
-            "remarks": ["like", f"%{q}%"],
         },
         fields=["name", "supplier", "item", "purchase_qty_quintal", "purchase_rate", "total_amount", "available_qty_quintal", "purchase_date"],
         limit=8,
@@ -289,7 +288,7 @@ def universal_global_search(query=None, limit=25, **kwargs):
         results.append({
             "id": p.name,
             "title": f"{p.name} — {p.supplier}",
-            "subtitle": f"Purchase: {flt(p.purchase_qty_quintal):,.0f} Qtl {p.item} @ ₹{flt(p.purchase_rate):,.0f} (Total ₹{flt(p.total_amount):,.2f}) · Avail: {flt(p.available_qty_quintal):,.0f} Qtl · Date: {p.purchase_date or ''}",
+            "subtitle": f"Purchase: {flt(p.purchase_qty_quintal):,.0f} Qtl {p.item} @ ₹{flt(p.purchase_rate):,.0f} (Total ₹{flt(p.total_amount):,.2f}) · Stock: {flt(p.available_qty_quintal):,.0f} Qtl · Date: {p.purchase_date or ''}",
             "category": "Sugar Purchase Voucher",
             "icon": "🛒",
             "doctype": "Sugar Purchase",
@@ -333,18 +332,20 @@ def universal_global_search(query=None, limit=25, **kwargs):
             "supplier": ["like", f"%{q}%"],
             "sugar_purchase": ["like", f"%{q}%"],
             "reference_no": ["like", f"%{q}%"],
-            "mode_of_payment": ["like", f"%{q}%"],
+            "utr_no": ["like", f"%{q}%"],
+            "payment_mode": ["like", f"%{q}%"],
         },
-        fields=["name", "supplier", "sugar_purchase", "paid_amount", "mode_of_payment", "reference_no", "payment_date"],
+        fields=["name", "supplier", "sugar_purchase", "paid_amount", "payment_mode", "reference_no", "utr_no", "payment_date"],
         limit=6,
         order_by="creation desc",
         ignore_permissions=True
     )
     for py in payments:
+        ref = py.utr_no or py.reference_no or "—"
         results.append({
             "id": py.name,
             "title": f"{py.name} — {py.supplier}",
-            "subtitle": f"Payment: ₹{flt(py.paid_amount):,.2f} ({py.mode_of_payment}) · UTR/Ref: {py.reference_no or '—'} · Lot: {py.sugar_purchase or '—'}",
+            "subtitle": f"Payment: ₹{flt(py.paid_amount):,.2f} ({py.payment_mode or 'RTGS'}) · UTR/Ref: {ref} · Lot: {py.sugar_purchase or '—'}",
             "category": "Purchase Payment Voucher",
             "icon": "💸",
             "doctype": "Purchase Payment",
@@ -362,6 +363,7 @@ def universal_global_search(query=None, limit=25, **kwargs):
             "dispatch_entry": ["like", f"%{q}%"],
             "utr_no": ["like", f"%{q}%"],
             "payment_mode": ["like", f"%{q}%"],
+            "remarks": ["like", f"%{q}%"],
         },
         fields=["name", "customer", "broker", "dispatch_entry", "paid_amount", "payment_mode", "utr_no", "payment_date"],
         limit=6,
