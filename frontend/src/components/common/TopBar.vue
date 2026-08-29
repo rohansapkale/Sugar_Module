@@ -1,6 +1,6 @@
 <template>
   <div id="topbar">
-    <!-- Left: Hamburger & Brand Title -->
+    <!-- Left: Hamburger, Logo & Brand Title -->
     <div class="brand">
       <button class="hamburger-btn" title="Toggle Navigation Menu">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -9,6 +9,7 @@
           <line x1="3" y1="18" x2="21" y2="18"></line>
         </svg>
       </button>
+      <img :src="logoUrl" alt="Logo" class="topbar-logo-img" />
       <strong>SUGAR DESK</strong> 
       <span class="company-sub-title">· {{ companyName }}</span>
     </div>
@@ -70,7 +71,9 @@
 import { computed } from 'vue'
 import { useFrappeApi } from '../../composables/useFrappeApi'
 import { useTheme } from '../../composables/useTheme'
+import logoImg from '../../assets/logo.png'
 
+const logoUrl = logoImg
 const { bootState } = useFrappeApi()
 const { isDarkMode, toggleTheme } = useTheme()
 
@@ -129,6 +132,17 @@ const goToErpNext = () => {
 
 .hamburger-btn:hover {
   background: rgba(255, 255, 255, 0.12);
+}
+
+.topbar-logo-img {
+  height: 28px;
+  width: 28px;
+  border-radius: 6px;
+  object-fit: contain;
+  background: #ffffff;
+  padding: 1.5px;
+  margin: 0 6px 0 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .role-selector-pill {

@@ -5,12 +5,8 @@
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 14px;">
         <!-- Left: Brand Logo & Title -->
         <div style="display: flex; align-items: center; gap: 14px;">
-          <div class="fd-brand-badge">
-            <span class="fd-logo-text">FD</span>
-            <svg class="fd-leaf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M11 20A7 7 0 0 1 4 13c0-4.418 3.582-8 8-8s8 3.582 8 8a7 7 0 0 1-7 7z"></path>
-              <line x1="12" y1="9" x2="12" y2="15"></line>
-            </svg>
+          <div class="cbd-brand-logo-wrap">
+            <img :src="logoUrl" alt="CBD IT Solutions" class="cbd-brand-logo-img" />
           </div>
           <div>
             <h1 class="gateway-main-title">Gateway of Sugar</h1>
@@ -293,7 +289,9 @@ import { useRouter } from 'vue-router'
 import { useFrappeApi } from '../composables/useFrappeApi'
 import { showToast, globalUiState } from '../composables/useKeyboardEngine'
 import MenuPanel from '../components/common/MenuPanel.vue'
+import logoImg from '../assets/logo.png'
 
+const logoUrl = logoImg
 const router = useRouter()
 const { getGatewayMetrics, universalGlobalSearch } = useFrappeApi()
 
@@ -522,32 +520,31 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.fd-brand-badge {
-  background: #081a36;
-  width: 48px;
-  height: 48px;
+.cbd-brand-logo-wrap {
+  width: 52px;
+  height: 52px;
   border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  padding: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
-.fd-logo-text {
-  color: #facc15;
-  font-weight: 900;
-  font-size: 16px;
-  letter-spacing: -0.5px;
-  line-height: 1;
+body.dark-mode .cbd-brand-logo-wrap {
+  background: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-.fd-leaf-icon {
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
+.cbd-brand-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .gateway-main-title {
