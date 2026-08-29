@@ -218,7 +218,273 @@ def search_ledgers_and_parties(query=None, doctype=None, limit=50, **kwargs):
             "type": f"Item ({i.stock_uom or 'Qtl'})",
         })
 
-    return results
+@frappe.whitelist(methods=["GET", "POST"], allow_guest=True)
+def universal_global_search(query=None, limit=25, **kwargs):
+    """
+    Universal High-Speed Global Search across literally EVERYTHING:
+    1. Screens, Views & Reports
+    2. Specific Transactions / Vouchers by ID, Reference, UTR, Vehicle No, Party, Rate, or Amount
+    3. Master Entities by Name, Mobile, City, or Grade
+    """
+    q = (query or frappe.form_dict.get("query") or "").strip()
+    if not q:
+        return []
+
+    limit = int(limit or 25)
+    results = []
+    q_lower = q.lower()
+
+    # -------------------------------------------------------------
+    # 1. SCREENS, REGISTERS & REPORTS
+    # -------------------------------------------------------------
+    SYSTEM_SCREENS = [
+        {"title": "Gateway of Sugar", "route": "/", "category": "Navigation", "tags": "gateway home dashboard start", "icon": "🌾"},
+        {"title": "Sugar Purchase Voucher (P)", "route": "/voucher/purchase", "category": "Voucher Entry", "tags": "purchase sauda inward buy lot f9 p", "icon": "🛒"},
+        {"title": "Dispatch Entry Voucher (D)", "route": "/voucher/dispatch", "category": "Voucher Entry", "tags": "dispatch sales delivery out f8 d", "icon": "🚚"},
+        {"title": "Purchase Payment Voucher (Y)", "route": "/voucher/payment", "category": "Voucher Entry", "tags": "payment supplier mill disbursement rtgs f5 y", "icon": "💸"},
+        {"title": "Broker Party Payment (Receipt) (R)", "route": "/voucher/receipt", "category": "Voucher Entry", "tags": "receipt collection customer broker payment f6 r", "icon": "🧾"},
+        {"title": "Contra / Bank Transfer Voucher (T)", "route": "/voucher/contra", "category": "Voucher Entry", "tags": "contra transfer bank cash f4 t", "icon": "🔄"},
+        {"title": "Sugar Purchases Register (Lots)", "route": "/register/purchase", "category": "Register / Report", "tags": "purchase register list lots purchases", "icon": "📋"},
+        {"title": "Dispatch Entries Register (Sales)", "route": "/register/dispatch", "category": "Register / Report", "tags": "dispatch register list sales deliveries", "icon": "📋"},
+        {"title": "Broker Receivables Outstanding Report", "route": "/register/broker-outstanding", "category": "Audit & Financial", "tags": "broker receivables due outstanding pending o", "icon": "⚠️"},
+        {"title": "Supplier Payables Outstanding Report", "route": "/register/supplier-outstanding", "category": "Audit & Financial", "tags": "supplier payables mills dues owed s", "icon": "🏭"},
+        {"title": "Day Book & Audit Register", "route": "/daybook", "category": "Audit & Financial", "tags": "day book audit transactions daily f10 b", "icon": "📖"},
+        {"title": "Sugar Mills / Suppliers Directory", "route": "/register/supplier", "category": "Masters", "tags": "suppliers mills directory list u s", "icon": "🏭"},
+        {"title": "Sugar Brokers Directory", "route": "/register/broker", "category": "Masters", "tags": "brokers directory list b", "icon": "🤝"},
+        {"title": "Customer Parties Directory", "route": "/register/customer", "category": "Masters", "tags": "customers parties buyers directory c", "icon": "👥"},
+        {"title": "Masters Directory (All Entities)", "route": "/masters", "category": "Masters", "tags": "masters items grades accounts directory m", "icon": "📁"},
+        {"title": "getMyErp (ERPNext Desk)", "externalUrl": "/desk/rajendra-narahari-lokhande", "category": "System", "tags": "getmyerp erpnext admin desk desk", "icon": "⚡"},
+    ]
+
+    for scr in SYSTEM_SCREENS:
+        if q_lower in scr["title"].lower() or q_lower in scr["tags"].lower():
+            results.append({
+                "id": scr["title"],
+                "title": scr["title"],
+                "subtitle": f"Open {scr['category']} View",
+                "category": scr["category"],
+                "icon": scr.get("icon", "📄"),
+                "route": scr.get("route"),
+                "externalUrl": scr.get("externalUrl"),
+            })
+
+    # -------------------------------------------------------------
+    # 2. SPECIFIC TRANSACTIONS / VOUCHERS (BY ID, REF, VEHICLE, PARTY)
+    # -------------------------------------------------------------
+    # A. Sugar Purchases
+    purchases = frappe.get_all(
+        "Sugar Purchase",
+        or_filters={
+            "name": ["like", f"%{q}%"],
+            "supplier": ["like", f"%{q}%"],
+            "item": ["like", f"%{q}%"],
+            "remarks": ["like", f"%{q}%"],
+        },
+        fields=["name", "supplier", "item", "purchase_qty_quintal", "purchase_rate", "total_amount", "available_qty_quintal", "purchase_date"],
+        limit=8,
+        order_by="creation desc",
+        ignore_permissions=True
+    )
+    for p in purchases:
+        results.append({
+            "id": p.name,
+            "title": f"{p.name} — {p.supplier}",
+            "subtitle": f"Purchase: {flt(p.purchase_qty_quintal):,.0f} Qtl {p.item} @ ₹{flt(p.purchase_rate):,.0f} (Total ₹{flt(p.total_amount):,.2f}) · Avail: {flt(p.available_qty_quintal):,.0f} Qtl · Date: {p.purchase_date or ''}",
+            "category": "Sugar Purchase Voucher",
+            "icon": "🛒",
+            "doctype": "Sugar Purchase",
+            "voucherId": p.name,
+            "route": f"/voucher/purchase?id={p.name}",
+        })
+
+    # B. Dispatch Entries
+    dispatches = frappe.get_all(
+        "Dispatch Entry",
+        or_filters={
+            "name": ["like", f"%{q}%"],
+            "customer_name": ["like", f"%{q}%"],
+            "broker": ["like", f"%{q}%"],
+            "vehicle_no": ["like", f"%{q}%"],
+            "sugar_purchase": ["like", f"%{q}%"],
+            "item": ["like", f"%{q}%"],
+        },
+        fields=["name", "customer_name", "broker", "vehicle_no", "dispatch_qty_quintal", "rate", "total_amount", "balance_amount", "dispatch_date"],
+        limit=8,
+        order_by="creation desc",
+        ignore_permissions=True
+    )
+    for d in dispatches:
+        results.append({
+            "id": d.name,
+            "title": f"{d.name} — {d.customer_name}",
+            "subtitle": f"Dispatch: {flt(d.dispatch_qty_quintal):,.0f} Qtl @ ₹{flt(d.rate):,.0f} · Veh: {d.vehicle_no or '—'} · Broker: {d.broker or 'Direct'} · Bal: ₹{flt(d.balance_amount):,.2f}",
+            "category": "Dispatch Entry Voucher",
+            "icon": "🚚",
+            "doctype": "Dispatch Entry",
+            "voucherId": d.name,
+            "route": f"/voucher/dispatch?id={d.name}",
+        })
+
+    # C. Purchase Payments (Suppliers)
+    payments = frappe.get_all(
+        "Purchase Payment",
+        or_filters={
+            "name": ["like", f"%{q}%"],
+            "supplier": ["like", f"%{q}%"],
+            "sugar_purchase": ["like", f"%{q}%"],
+            "reference_no": ["like", f"%{q}%"],
+            "mode_of_payment": ["like", f"%{q}%"],
+        },
+        fields=["name", "supplier", "sugar_purchase", "paid_amount", "mode_of_payment", "reference_no", "payment_date"],
+        limit=6,
+        order_by="creation desc",
+        ignore_permissions=True
+    )
+    for py in payments:
+        results.append({
+            "id": py.name,
+            "title": f"{py.name} — {py.supplier}",
+            "subtitle": f"Payment: ₹{flt(py.paid_amount):,.2f} ({py.mode_of_payment}) · UTR/Ref: {py.reference_no or '—'} · Lot: {py.sugar_purchase or '—'}",
+            "category": "Purchase Payment Voucher",
+            "icon": "💸",
+            "doctype": "Purchase Payment",
+            "voucherId": py.name,
+            "route": f"/voucher/payment?id={py.name}",
+        })
+
+    # D. Broker Party Payments (Receipts)
+    receipts = frappe.get_all(
+        "Broker Party Payment",
+        or_filters={
+            "name": ["like", f"%{q}%"],
+            "customer": ["like", f"%{q}%"],
+            "broker": ["like", f"%{q}%"],
+            "dispatch_entry": ["like", f"%{q}%"],
+            "utr_no": ["like", f"%{q}%"],
+            "payment_mode": ["like", f"%{q}%"],
+        },
+        fields=["name", "customer", "broker", "dispatch_entry", "paid_amount", "payment_mode", "utr_no", "payment_date"],
+        limit=6,
+        order_by="creation desc",
+        ignore_permissions=True
+    )
+    for rc in receipts:
+        results.append({
+            "id": rc.name,
+            "title": f"{rc.name} — {rc.customer or rc.broker}",
+            "subtitle": f"Receipt: ₹{flt(rc.paid_amount):,.2f} ({rc.payment_mode or 'Bank'}) · UTR: {rc.utr_no or '—'} · Dispatch: {rc.dispatch_entry or '—'}",
+            "category": "Broker Receipt Voucher",
+            "icon": "🧾",
+            "doctype": "Broker Party Payment",
+            "voucherId": rc.name,
+            "route": f"/voucher/receipt?id={rc.name}",
+        })
+
+    # -------------------------------------------------------------
+    # 3. MASTERS ENTITIES (SUPPLIERS, BROKERS, CUSTOMERS, ITEMS, ACCOUNTS)
+    # -------------------------------------------------------------
+    # Suppliers
+    suppliers = frappe.get_all(
+        "Supplier",
+        or_filters={"name": ["like", f"%{q}%"], "supplier_name": ["like", f"%{q}%"]},
+        fields=["name", "supplier_name"],
+        limit=5,
+        ignore_permissions=True
+    )
+    for s in suppliers:
+        s_name = s.supplier_name or s.name
+        results.append({
+            "id": s.name,
+            "title": s_name,
+            "subtitle": f"Sugar Mill / Supplier Entity [{s.name}]",
+            "category": "Supplier / Mill",
+            "icon": "🏭",
+            "doctype": "Supplier",
+            "route": f"/register/supplier?search={s_name}",
+        })
+
+    # Brokers
+    brokers = frappe.get_all(
+        "Broker",
+        or_filters={"name": ["like", f"%{q}%"], "broker_name": ["like", f"%{q}%"], "mobile_no": ["like", f"%{q}%"], "city": ["like", f"%{q}%"]},
+        fields=["name", "broker_name", "mobile_no", "city"],
+        limit=5,
+        ignore_permissions=True
+    )
+    for b in brokers:
+        b_name = b.broker_name or b.name
+        sub = f"Broker · City: {b.city or '—'}" + (f" · Mobile: {b.mobile_no}" if b.mobile_no else "")
+        results.append({
+            "id": b.name,
+            "title": b_name,
+            "subtitle": sub,
+            "category": "Broker",
+            "icon": "🤝",
+            "doctype": "Broker",
+            "route": f"/register/broker?search={b_name}",
+        })
+
+    # Customers
+    customers = frappe.get_all(
+        "Customer",
+        or_filters={"name": ["like", f"%{q}%"], "customer_name": ["like", f"%{q}%"]},
+        fields=["name", "customer_name"],
+        limit=5,
+        ignore_permissions=True
+    )
+    for c in customers:
+        c_name = c.customer_name or c.name
+        results.append({
+            "id": c.name,
+            "title": c_name,
+            "subtitle": f"Customer Party Entity [{c.name}]",
+            "category": "Customer Party",
+            "icon": "👥",
+            "doctype": "Customer",
+            "route": f"/register/customer?search={c_name}",
+        })
+
+    # Items
+    items = frappe.get_all(
+        "Item",
+        or_filters={"name": ["like", f"%{q}%"], "item_name": ["like", f"%{q}%"]},
+        fields=["name", "item_name", "stock_uom"],
+        limit=4,
+        ignore_permissions=True
+    )
+    for itm in items:
+        results.append({
+            "id": itm.name,
+            "title": itm.item_name or itm.name,
+            "subtitle": f"Sugar Item / Grade (UOM: {itm.stock_uom or 'Qtl'})",
+            "category": "Sugar Item",
+            "icon": "🏷️",
+            "doctype": "Item",
+            "route": "/masters",
+        })
+
+    # Accounts
+    accounts = frappe.get_all(
+        "Account",
+        filters={"is_group": 0},
+        or_filters={"name": ["like", f"%{q}%"], "account_name": ["like", f"%{q}%"]},
+        fields=["name", "account_name", "account_type"],
+        limit=4,
+        ignore_permissions=True
+    )
+    for acc in accounts:
+        results.append({
+            "id": acc.name,
+            "title": acc.account_name or acc.name,
+            "subtitle": f"Account · {acc.account_type or 'Ledger'}",
+            "category": "Bank / Cash Account",
+            "icon": "🏦",
+            "doctype": "Account",
+            "route": "/masters",
+        })
+
+    return results[:limit]
+
 
 
 def resolve_link(doctype, value, name_field=None):

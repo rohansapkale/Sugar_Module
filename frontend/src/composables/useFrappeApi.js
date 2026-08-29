@@ -221,6 +221,19 @@ export function useFrappeApi() {
     return null
   }
 
+  const universalGlobalSearch = async (query = '') => {
+    try {
+      const res = await fetch(`/api/method/sugar_module.sugar_module.api.universal_global_search?query=${encodeURIComponent(query)}&limit=30`)
+      if (res.ok) {
+        const data = await res.json()
+        return data.message || data || []
+      }
+    } catch (e) {
+      console.error('[FrappeApi] universalGlobalSearch error:', e)
+    }
+    return []
+  }
+
   return {
     bootState,
     isOnline,
@@ -233,5 +246,6 @@ export function useFrappeApi() {
     getVoucherDetails,
     getMastersSummary,
     getGatewayMetrics,
+    universalGlobalSearch,
   }
 }
