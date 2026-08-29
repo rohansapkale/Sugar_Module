@@ -256,7 +256,7 @@
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useFrappeApi } from '../composables/useFrappeApi'
-import { showToast } from '../composables/useKeyboardEngine'
+import { showToast, globalUiState } from '../composables/useKeyboardEngine'
 import MenuPanel from '../components/common/MenuPanel.vue'
 
 const router = useRouter()
@@ -314,22 +314,24 @@ const setPeriod = (p) => {
 
 // Global Menu items matching the sidebar
 const flatMenuItems = [
+  // Categories
+  { key: 'M', action: () => { globalUiState.activeSidebarCategory.value = 'MASTERS'; showToast('🏛️ Masters (M)') } },
+  { key: 'V', action: () => { globalUiState.activeSidebarCategory.value = 'VOUCHERS'; showToast('📝 Vouchers (V)') } },
+  { key: 'R', action: () => { globalUiState.activeSidebarCategory.value = 'REPORTS'; showToast('📊 Reports (R)') } },
+  // Vouchers (P, D, Y, R, T)
+  { key: 'P', action: () => router.push('/voucher/purchase') },
+  { key: 'D', action: () => router.push('/voucher/dispatch') },
+  { key: 'Y', action: () => router.push('/voucher/payment') },
+  { key: 'T', action: () => router.push('/voucher/contra') },
   // Masters
   { key: 'S', action: () => router.push('/register/supplier') },
   { key: 'B', action: () => router.push('/register/broker') },
+  { key: 'C', action: () => router.push('/register/customer') },
   { key: 'I', action: () => router.push('/masters') },
-  { key: 'M', action: () => router.push('/masters') },
-  // Vouchers
-  { key: 'F9', action: () => router.push('/voucher/purchase') },
-  { key: 'F8', action: () => router.push('/voucher/dispatch') },
-  { key: 'F5', action: () => router.push('/voucher/payment') },
-  { key: 'F6', action: () => router.push('/voucher/receipt') },
-  { key: 'F4', action: () => router.push('/voucher/contra') },
   // Reports
-  { key: 'P', action: () => router.push('/register/purchase') },
-  { key: 'D', action: () => router.push('/register/dispatch') },
-  { key: 'R', action: () => router.push('/register/broker-outstanding') },
-  { key: 'O', action: () => router.push('/register/supplier-outstanding') },
+  { key: 'L', action: () => router.push('/register/purchase') },
+  { key: 'K', action: () => router.push('/register/dispatch') },
+  { key: 'O', action: () => router.push('/register/broker-outstanding') },
   { key: 'F10', action: () => router.push('/daybook') },
 ]
 

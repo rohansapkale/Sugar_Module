@@ -703,11 +703,11 @@ const isReadOnly = computed(() => !!voucherId.value)
 const defaultCompany = computed(() => bootState.default_company || 'Rajendra Narahari Lokhande')
 
 const VOUCHER_CONFIGS = {
-  purchase: { title: 'Sugar Purchase Voucher (F9)', doctype: 'Sugar Purchase', registerRoute: '/register/purchase' },
-  dispatch: { title: 'Dispatch Entry Voucher (F8)', doctype: 'Dispatch Entry', registerRoute: '/register/dispatch' },
-  payment: { title: 'Purchase Payment Voucher (F5)', doctype: 'Purchase Payment', registerRoute: '/register/payment' },
-  receipt: { title: 'Broker Party Payment (Receipt) (F6)', doctype: 'Broker Party Payment', registerRoute: '/register/receipt' },
-  contra: { title: 'Contra / Bank Transfer (F4)', doctype: 'Account', registerRoute: '/register/purchase' },
+  purchase: { title: 'Sugar Purchase Voucher (P)', doctype: 'Sugar Purchase', registerRoute: '/register/purchase' },
+  dispatch: { title: 'Dispatch Entry Voucher (D)', doctype: 'Dispatch Entry', registerRoute: '/register/dispatch' },
+  payment: { title: 'Purchase Payment Voucher (Y)', doctype: 'Purchase Payment', registerRoute: '/register/payment' },
+  receipt: { title: 'Broker Party Payment (Receipt) (R)', doctype: 'Broker Party Payment', registerRoute: '/register/receipt' },
+  contra: { title: 'Contra / Bank Transfer (T)', doctype: 'Account', registerRoute: '/register/purchase' },
 }
 
 const currentConfig = computed(() => VOUCHER_CONFIGS[voucherType.value] || VOUCHER_CONFIGS.purchase)
@@ -771,14 +771,14 @@ const formatNumber = (val) => {
 
 // Side Menu Items
 const voucherMenuItems = [
-  { key: 'F4', label: 'Contra', route: '/voucher/contra' },
-  { key: 'F5', label: 'Payment', route: '/voucher/payment' },
-  { key: 'F6', label: 'Receipt', route: '/voucher/receipt' },
-  { key: 'F8', label: 'Dispatch', route: '/voucher/dispatch' },
-  { key: 'F9', label: 'Purchase', route: '/voucher/purchase' },
+  { key: 'P', label: 'Purchase', route: '/voucher/purchase' },
+  { key: 'D', label: 'Dispatch', route: '/voucher/dispatch' },
+  { key: 'Y', label: 'Payment Entry', route: '/voucher/payment' },
+  { key: 'R', label: 'Receipt Entry', route: '/voucher/receipt' },
+  { key: 'T', label: 'Contra / Bank Transfer', route: '/voucher/contra' },
   { key: 'L', label: 'Purchase List', route: '/register/purchase' },
   { key: 'K', label: 'Dispatch List', route: '/register/dispatch' },
-  { key: 'B', label: 'Day Book (F10)', route: '/daybook' },
+  { key: 'B', label: 'Day Book', route: '/daybook' },
   { key: 'Esc', label: 'Gateway Menu', route: '/' },
 ]
 

@@ -2,6 +2,12 @@ import { ref } from 'vue'
 import { router } from '../router'
 
 export const VOUCHER_TYPE_MAP = {
+  P: { name: 'Sugar Purchase', title: 'Sugar Purchase Voucher', route: '/voucher/purchase' },
+  D: { name: 'Dispatch Entry', title: 'Dispatch Entry (Sales/Delivery)', route: '/voucher/dispatch' },
+  Y: { name: 'Purchase Payment', title: 'Purchase Payment (Supplier)', route: '/voucher/payment' },
+  R: { name: 'Broker Party Payment', title: 'Broker Party Payment (Receipt)', route: '/voucher/receipt' },
+  T: { name: 'Contra', title: 'Contra Voucher', route: '/voucher/contra' },
+  // Function keys compatibility
   F4: { name: 'Contra', title: 'Contra Voucher', route: '/voucher/contra' },
   F5: { name: 'Purchase Payment', title: 'Purchase Payment (Supplier)', route: '/voucher/payment' },
   F6: { name: 'Broker Party Payment', title: 'Broker Party Payment (Receipt)', route: '/voucher/receipt' },
@@ -9,7 +15,7 @@ export const VOUCHER_TYPE_MAP = {
   F9: { name: 'Sugar Purchase', title: 'Sugar Purchase Voucher', route: '/voucher/purchase' },
 }
 
-// Global shared UI state for modals and overlays
+// Global shared UI state for modals, overlays, and active sidebar category
 export const globalUiState = {
   isHelpOpen: ref(false),
   isDateModalOpen: ref(false),
@@ -18,6 +24,7 @@ export const globalUiState = {
   confirmModalData: ref(null),
   toastMessage: ref(''),
   toastVisible: ref(false),
+  activeSidebarCategory: ref('ALL'), // 'ALL' | 'MASTERS' | 'VOUCHERS' | 'REPORTS'
 }
 
 let toastTimer = null
@@ -70,7 +77,7 @@ export function handleFunctionKey(fk) {
   }
 }
 
-// Singleton Global Keydown Handler to prevent duplicate listeners
+// Singleton Global Keydown Handler
 let isGlobalListenerAttached = false
 
 function initGlobalKeyboardListener() {
@@ -78,6 +85,9 @@ function initGlobalKeyboardListener() {
   isGlobalListenerAttached = true
 
   window.addEventListener('keydown', (e) => {
+    // Ignore keypresses inside input/textarea/select unless it's an overlay trigger
+    const inInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)
+
     // 1. Alt+G / Alt+g / Ctrl+G / Ctrl+K -> Toggle Go To Command Palette
     const isGKey = e.key === 'g' || e.key === 'G' || e.code === 'KeyG'
     const isKKey = e.key === 'k' || e.key === 'K' || e.code === 'KeyK'
@@ -127,16 +137,67 @@ function initGlobalKeyboardListener() {
       return
     }
 
-    // 6. Global Escape Navigation Handler (returns to Gateway from any report, register, master or voucher)
+    // 6. Global Escape Navigation Handler (returns to Gateway)
     if (e.key === 'Escape') {
       e.preventDefault()
-      if (document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+      if (document.activeElement && inInput) {
         document.activeElement.blur()
       }
       if (router && router.currentRoute.value.path !== '/') {
         router.push('/')
       }
       return
+    }
+
+    // 7. Navigation Hotkeys outside inputs (M = Masters, V = Vouchers, R = Reports / Receipt)
+    if (!inInput && !e.altKey && !e.ctrlKey && !e.metaKey) {
+      const key = e.key.toUpperCase()
+
+      // Category Switching
+      if (key === 'M') {
+        e.preventDefault()
+        globalUiState.activeSidebarCategory.value = 'MASTERS'
+        showToast('🏛️ Masters Menu Activated (M)')
+        return
+      }
+      if (key === 'V') {
+        e.preventDefault()
+        globalUiState.activeSidebarCategory.value = 'VOUCHERS'
+        showToast('📝 Vouchers Menu Activated (V)')
+        return
+      }
+
+      // Direct Voucher Hotkeys (P = Purchase, D = Dispatch, Y = Payment, R = Receipt, T = Contra)
+      if (key === 'P') {
+        e.preventDefault()
+        if (router) router.push('/voucher/purchase')
+        return
+      }
+      if (key === 'D') {
+        e.preventDefault()
+        if (router) router.push('/voucher/dispatch')
+        return
+      }
+      if (key === 'Y') {
+        e.preventDefault()
+        if (router) router.push('/voucher/payment')
+        return
+      }
+      if (key === 'T') {
+        e.preventDefault()
+        if (router) router.push('/voucher/contra')
+        return
+      }
+      if (key === 'R') {
+        e.preventDefault()
+        if (globalUiState.activeSidebarCategory.value === 'VOUCHERS' || router.currentRoute.value.path.startsWith('/voucher')) {
+          if (router) router.push('/voucher/receipt')
+        } else {
+          globalUiState.activeSidebarCategory.value = 'REPORTS'
+          showToast('📊 Reports Menu Activated (R)')
+        }
+        return
+      }
     }
   }, { capture: true })
 }
