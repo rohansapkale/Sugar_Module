@@ -1,7 +1,7 @@
 <template>
   <div class="dropdown-menu-list" ref="dropdownRef">
     <div class="dropdown-header">
-      <span>⚡ Live Frappe DB ({{ matches.length }} options)</span>
+      <span>⚡ Live DB ({{ matches.length }} options)</span>
       <span class="tip">↑↓ browse · Enter pick</span>
     </div>
 

@@ -983,18 +983,22 @@ def get_register_data(voucher_type=None, query=None, limit=100, **kwargs):
                 ignore_permissions=True
             )
             s["total_lots"] = len(purchases)
-            s["total_qty"] = sum(flt(p.purchase_qty_quintal) for p in purchases)
-            s["total_amount"] = sum(flt(p.total_amount) for p in purchases)
+            s["total_purchase_qty"] = sum(flt(p.purchase_qty_quintal) for p in purchases)
+            s["total_qty"] = s["total_purchase_qty"]
+            s["total_purchase_amount"] = sum(flt(p.total_amount) for p in purchases)
+            s["total_amount"] = s["total_purchase_amount"]
             s["available_stock"] = sum(flt(p.available_qty_quintal) for p in purchases)
 
         return {
             "voucher_type": "Supplier",
-            "title": "Suppliers & Sugar Mills Register",
+            "title": "Sugar Mills / Suppliers Directory",
             "records": records,
             "summary": {
                 "total_count": len(records),
                 "total_qty": sum(flt(r.get("total_qty", 0)) for r in records),
+                "total_purchase_qty": sum(flt(r.get("total_purchase_qty", 0)) for r in records),
                 "total_amount": sum(flt(r.get("total_amount", 0)) for r in records),
+                "total_purchase_amount": sum(flt(r.get("total_purchase_amount", 0)) for r in records),
                 "total_available_qty": sum(flt(r.get("available_stock", 0)) for r in records),
             }
         }
@@ -1024,18 +1028,22 @@ def get_register_data(voucher_type=None, query=None, limit=100, **kwargs):
                 ignore_permissions=True
             )
             b["total_dispatches"] = len(dispatches)
-            b["total_qty"] = sum(flt(d.dispatch_qty_quintal) for d in dispatches)
-            b["total_amount"] = sum(flt(d.total_amount) for d in dispatches)
+            b["total_sold_qty"] = sum(flt(d.dispatch_qty_quintal) for d in dispatches)
+            b["total_qty"] = b["total_sold_qty"]
+            b["total_sold_amount"] = sum(flt(d.total_amount) for d in dispatches)
+            b["total_amount"] = b["total_sold_amount"]
             b["total_balance"] = sum(flt(d.balance_amount) for d in dispatches)
 
         return {
             "voucher_type": "Broker",
-            "title": "Sugar Brokers Register",
+            "title": "Sugar Brokers Directory",
             "records": records,
             "summary": {
                 "total_count": len(records),
                 "total_qty": sum(flt(r.get("total_qty", 0)) for r in records),
+                "total_sold_qty": sum(flt(r.get("total_sold_qty", 0)) for r in records),
                 "total_amount": sum(flt(r.get("total_amount", 0)) for r in records),
+                "total_sold_amount": sum(flt(r.get("total_sold_amount", 0)) for r in records),
                 "total_balance": sum(flt(r.get("total_balance", 0)) for r in records),
             }
         }
@@ -1055,12 +1063,29 @@ def get_register_data(voucher_type=None, query=None, limit=100, **kwargs):
             ignore_permissions=True
         )
 
+        for c in records:
+            dispatches = frappe.get_all(
+                "Dispatch Entry",
+                filters={"customer_name": c.name, "docstatus": ["!=", 2]},
+                fields=["dispatch_qty_quintal", "total_amount", "balance_amount"],
+                ignore_permissions=True
+            )
+            c["total_dispatches"] = len(dispatches)
+            c["total_sold_qty"] = sum(flt(d.dispatch_qty_quintal) for d in dispatches)
+            c["total_qty"] = c["total_sold_qty"]
+            c["total_amount"] = sum(flt(d.total_amount) for d in dispatches)
+            c["total_balance"] = sum(flt(d.balance_amount) for d in dispatches)
+
         return {
             "voucher_type": "Customer",
             "title": "Customer Parties Register",
             "records": records,
             "summary": {
                 "total_count": len(records),
+                "total_qty": sum(flt(r.get("total_qty", 0)) for r in records),
+                "total_sold_qty": sum(flt(r.get("total_sold_qty", 0)) for r in records),
+                "total_amount": sum(flt(r.get("total_amount", 0)) for r in records),
+                "total_balance": sum(flt(r.get("total_balance", 0)) for r in records),
             }
         }
 

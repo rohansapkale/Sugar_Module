@@ -11,8 +11,8 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Search party, broker, voucher..."
-            style="width: 220px; padding: 6px 10px; font-size: 13px; border: 1px solid var(--blue); border-radius: 4px; outline: none; background: var(--input-bg); color: var(--text);"
+            :placeholder="searchPlaceholder"
+            style="width: 230px; padding: 6px 10px; font-size: 13px; border: 1px solid var(--blue); border-radius: 4px; outline: none; background: var(--input-bg); color: var(--text);"
             @input="filterDebounce"
           />
 
@@ -46,21 +46,21 @@
       </div>
 
       <!-- KPI Summary Cards for Standard Registers -->
-      <div v-if="summary && !['broker-outstanding', 'supplier-outstanding'].includes(registerType)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px;">
+      <div v-if="summary && !['broker-outstanding', 'supplier-outstanding'].includes(registerType)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px;">
         <div class="summary-card">
-          <div class="sc-label">Total {{ ['supplier', 'broker', 'customer'].includes(registerType) ? 'Masters' : 'Vouchers' }}</div>
+          <div class="sc-label">{{ countKpiLabel }}</div>
           <div class="sc-val">{{ summary.total_count || 0 }}</div>
         </div>
         <div v-if="summary.total_qty !== undefined && summary.total_qty > 0" class="summary-card">
-          <div class="sc-label">Total Qty (Qtl)</div>
-          <div class="sc-val" style="color: var(--blue);">{{ formatNumber(summary.total_qty) }}</div>
+          <div class="sc-label">{{ qtyKpiLabel }}</div>
+          <div class="sc-val" style="color: var(--blue);">{{ formatNumber(summary.total_qty) }} <span style="font-size: 11px; font-weight: normal; color: var(--muted);">Qtl</span></div>
         </div>
-        <div v-if="summary.total_available_qty !== undefined" class="summary-card">
+        <div v-if="summary.total_available_qty !== undefined && ['supplier', 'purchase'].includes(registerType)" class="summary-card">
           <div class="sc-label">Available Stock (Qtl)</div>
-          <div class="sc-val" style="color: var(--green);">{{ formatNumber(summary.total_available_qty) }}</div>
+          <div class="sc-val" style="color: var(--green);">{{ formatNumber(summary.total_available_qty) }} <span style="font-size: 11px; font-weight: normal; color: var(--muted);">Qtl</span></div>
         </div>
         <div v-if="summary.total_amount !== undefined && summary.total_amount > 0" class="summary-card">
-          <div class="sc-label">Total Amount (₹)</div>
+          <div class="sc-label">{{ amountKpiLabel }}</div>
           <div class="sc-val" style="color: var(--navy);">₹{{ formatCurrency(summary.total_amount) }}</div>
         </div>
         <div v-if="summary.total_paid !== undefined" class="summary-card">
@@ -68,11 +68,11 @@
           <div class="sc-val" style="color: var(--green);">₹{{ formatCurrency(summary.total_paid) }}</div>
         </div>
         <div v-if="summary.total_remaining !== undefined && summary.total_remaining > 0" class="summary-card">
-          <div class="sc-label">Remaining (₹)</div>
+          <div class="sc-label">Total Payable Due (₹)</div>
           <div class="sc-val" style="color: var(--red);">₹{{ formatCurrency(summary.total_remaining) }}</div>
         </div>
         <div v-if="summary.total_balance !== undefined && summary.total_balance > 0" class="summary-card">
-          <div class="sc-label">Pending Balance (₹)</div>
+          <div class="sc-label">Total Outstanding Due (₹)</div>
           <div class="sc-val" style="color: var(--amber);">₹{{ formatCurrency(summary.total_balance) }}</div>
         </div>
       </div>
@@ -234,9 +234,9 @@
             <th style="width: 28%;">Sugar Mill (Supplier Name)</th>
             <th style="width: 14%;">Group / Type</th>
             <th style="width: 12%; text-align: right;">Total Lots</th>
-            <th style="width: 14%; text-align: right;">Total Qty (Qtl)</th>
+            <th style="width: 15%; text-align: right;">Total Purchase Qty (Qtl)</th>
             <th style="width: 16%; text-align: right;">Total Purchases</th>
-            <th style="width: 16%; text-align: right;">Available Stock</th>
+            <th style="width: 15%; text-align: right;">Available Stock</th>
           </tr>
         </thead>
         <tbody>
@@ -245,12 +245,13 @@
             :key="r.name || idx"
             :class="['daybook-row', { hi: activeRowIndex === idx }]"
             @click="activeRowIndex = idx"
+            @dblclick="openVoucher(r)"
           >
             <td style="font-weight: 700; color: var(--navy);">{{ r.supplier_name || r.name }}</td>
             <td><span class="code-badge">{{ r.supplier_group || 'Sugar Mill' }}</span></td>
-            <td style="text-align: right; font-family: monospace;">{{ r.total_lots }} Lots</td>
-            <td style="text-align: right; font-family: monospace; font-weight: 600;">{{ formatNumber(r.total_qty) }} Qtl</td>
-            <td style="text-align: right; font-family: monospace; font-weight: 700;">₹{{ formatCurrency(r.total_amount) }}</td>
+            <td style="text-align: right; font-family: monospace;">{{ r.total_lots || 0 }} Lots</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: var(--blue);">{{ formatNumber(r.total_purchase_qty || r.total_qty) }} Qtl</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700;">₹{{ formatCurrency(r.total_purchase_amount || r.total_amount) }}</td>
             <td style="text-align: right; font-family: monospace; font-weight: 700; color: var(--green);">{{ formatNumber(r.available_stock) }} Qtl</td>
           </tr>
         </tbody>
@@ -260,12 +261,13 @@
       <table v-else-if="registerType === 'broker' && records.length" class="daybook-table">
         <thead>
           <tr>
-            <th style="width: 18%;">Broker ID</th>
             <th style="width: 25%;">Broker Name</th>
-            <th style="width: 15%;">Mobile No</th>
+            <th style="width: 14%;">Mobile No</th>
             <th style="width: 14%;">City / State</th>
-            <th style="width: 14%; text-align: right;">Dispatches Qtl</th>
-            <th style="width: 14%; text-align: right;">Pending Balance</th>
+            <th style="width: 12%; text-align: right;">Total Dispatches</th>
+            <th style="width: 15%; text-align: right;">Total Sold (Qtl)</th>
+            <th style="width: 18%; text-align: right;">Total Sales Val (₹)</th>
+            <th style="width: 16%; text-align: right;">Pending Balance (₹)</th>
           </tr>
         </thead>
         <tbody>
@@ -274,12 +276,14 @@
             :key="r.name || idx"
             :class="['daybook-row', { hi: activeRowIndex === idx }]"
             @click="activeRowIndex = idx"
+            @dblclick="openVoucher(r)"
           >
-            <td style="font-family: monospace; font-weight: 700; color: var(--navy);">{{ r.name }}</td>
-            <td style="font-weight: 700;">{{ r.broker_name || r.name }}</td>
+            <td style="font-weight: 700; color: var(--navy);">{{ r.broker_name || r.name }}</td>
             <td style="font-family: monospace;">{{ r.mobile_no || '—' }}</td>
-            <td>{{ r.city || '—' }}</td>
-            <td style="text-align: right; font-family: monospace; font-weight: 600;">{{ formatNumber(r.total_qty) }} Qtl</td>
+            <td>{{ r.city || r.state || '—' }}</td>
+            <td style="text-align: right; font-family: monospace;">{{ r.total_dispatches || 0 }} Dispatches</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: var(--blue);">{{ formatNumber(r.total_sold_qty || r.total_qty) }} Qtl</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700;">₹{{ formatCurrency(r.total_sold_amount || r.total_amount) }}</td>
             <td style="text-align: right; font-family: monospace; font-weight: 700; color: var(--red);">₹{{ formatCurrency(r.total_balance) }}</td>
           </tr>
         </tbody>
@@ -289,10 +293,11 @@
       <table v-else-if="registerType === 'customer' && records.length" class="daybook-table">
         <thead>
           <tr>
-            <th style="width: 25%;">Customer ID</th>
-            <th style="width: 35%;">Customer Party Name</th>
-            <th style="width: 20%;">Customer Group</th>
-            <th style="width: 20%;">Territory</th>
+            <th style="width: 30%;">Customer Party Name</th>
+            <th style="width: 18%;">Group / Territory</th>
+            <th style="width: 14%; text-align: right;">Total Dispatches</th>
+            <th style="width: 16%; text-align: right;">Total Sold (Qtl)</th>
+            <th style="width: 18%; text-align: right;">Total Sales Val (₹)</th>
           </tr>
         </thead>
         <tbody>
@@ -301,11 +306,13 @@
             :key="r.name || idx"
             :class="['daybook-row', { hi: activeRowIndex === idx }]"
             @click="activeRowIndex = idx"
+            @dblclick="openVoucher(r)"
           >
-            <td style="font-family: monospace; font-weight: 700; color: var(--navy);">{{ r.name }}</td>
-            <td style="font-weight: 700;">{{ r.customer_name || r.name }}</td>
-            <td><span class="code-badge">{{ r.customer_group || 'All Customer Groups' }}</span></td>
-            <td>{{ r.territory || 'India' }}</td>
+            <td style="font-weight: 700; color: var(--navy);">{{ r.customer_name || r.name }}</td>
+            <td><span class="code-badge">{{ r.customer_group || r.territory || 'Customer Party' }}</span></td>
+            <td style="text-align: right; font-family: monospace;">{{ r.total_dispatches || 0 }} Dispatches</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: var(--blue);">{{ formatNumber(r.total_sold_qty || r.total_qty) }} Qtl</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700;">₹{{ formatCurrency(r.total_amount) }}</td>
           </tr>
         </tbody>
       </table>
@@ -484,72 +491,128 @@ const registerType = computed(() => route.params.type || 'purchase')
 const REGISTER_CONFIGS = {
   purchase: {
     voucherType: 'Sugar Purchase',
-    title: 'Sugar Purchase Register',
+    title: 'Sugar Purchase Register (Lots)',
     entryLabel: 'Purchase Entry',
     entryRoute: '/voucher/purchase',
-    fkCode: 'F9',
+    fkCode: 'P',
   },
   dispatch: {
     voucherType: 'Dispatch Entry',
     title: 'Dispatch Entry Register (Sales / Deliveries)',
     entryLabel: 'Dispatch Entry',
     entryRoute: '/voucher/dispatch',
-    fkCode: 'F8',
+    fkCode: 'D',
   },
   payment: {
     voucherType: 'Purchase Payment',
     title: 'Purchase Payment Register (Suppliers)',
-    entryLabel: 'Payment',
+    entryLabel: 'Payment Entry',
     entryRoute: '/voucher/payment',
-    fkCode: 'F5',
+    fkCode: 'Y',
   },
   receipt: {
     voucherType: 'Broker Party Payment',
-    title: 'Broker Receipt Register (Customers)',
-    entryLabel: 'Receipt',
+    title: 'Broker Party Payment Register (Receipts)',
+    entryLabel: 'Receipt Entry',
     entryRoute: '/voucher/receipt',
-    fkCode: 'F6',
+    fkCode: 'R',
   },
   supplier: {
     voucherType: 'Supplier',
     title: 'Sugar Mills / Suppliers Directory',
     entryLabel: 'Purchase Entry',
     entryRoute: '/voucher/purchase',
-    fkCode: 'F9',
+    fkCode: 'P',
   },
   broker: {
     voucherType: 'Broker',
-    title: 'Sugar Brokers Register (List)',
+    title: 'Sugar Brokers Directory',
     entryLabel: 'Dispatch Entry',
     entryRoute: '/voucher/dispatch',
-    fkCode: 'F8',
+    fkCode: 'D',
   },
   customer: {
     voucherType: 'Customer',
-    title: 'Customer Parties Register (List)',
+    title: 'Customer Parties Directory',
     entryLabel: 'Dispatch Entry',
     entryRoute: '/voucher/dispatch',
-    fkCode: 'F8',
+    fkCode: 'D',
   },
   'broker-outstanding': {
     voucherType: 'broker-outstanding',
     title: 'Broker / Customer Outstanding Receivables Report',
-    entryLabel: 'Receipt',
+    entryLabel: 'Receipt Entry',
     entryRoute: '/voucher/receipt',
-    fkCode: 'F6',
+    fkCode: 'R',
   },
   'supplier-outstanding': {
     voucherType: 'supplier-outstanding',
     title: 'Supplier / Mill Outstanding Payables Report',
-    entryLabel: 'Payment',
+    entryLabel: 'Payment Entry',
     entryRoute: '/voucher/payment',
-    fkCode: 'F5',
+    fkCode: 'Y',
   },
 }
 
 const currentConfig = computed(() => REGISTER_CONFIGS[registerType.value] || REGISTER_CONFIGS.purchase)
 const registerTitle = computed(() => currentConfig.value.title)
 const companyName = computed(() => bootState.default_company || 'Mahalaxmi Sugar Mills Pvt. Ltd.')
+
+const searchPlaceholder = computed(() => {
+  switch (registerType.value) {
+    case 'supplier': return 'Search Supplier...'
+    case 'broker': return 'Search Broker...'
+    case 'customer': return 'Search Customer Party...'
+    case 'purchase': return 'Search Purchase Lot / Mill...'
+    case 'dispatch': return 'Search Dispatch / Customer / Broker...'
+    case 'payment': return 'Search Payment / Supplier...'
+    case 'receipt': return 'Search Receipt / Customer / Broker...'
+    case 'broker-outstanding': return 'Search Broker / Outstanding...'
+    case 'supplier-outstanding': return 'Search Supplier / Payable...'
+    default: return 'Search party, broker, voucher...'
+  }
+})
+
+const countKpiLabel = computed(() => {
+  switch (registerType.value) {
+    case 'supplier': return 'Total Suppliers / Mills'
+    case 'broker': return 'Total Brokers'
+    case 'customer': return 'Total Customers'
+    case 'purchase': return 'Total Purchase Lots'
+    case 'dispatch': return 'Total Dispatches'
+    case 'payment': return 'Total Payments'
+    case 'receipt': return 'Total Receipts'
+    default: return 'Total Records'
+  }
+})
+
+const qtyKpiLabel = computed(() => {
+  switch (registerType.value) {
+    case 'supplier':
+    case 'purchase':
+      return 'Total Purchase Qty (Qtl)'
+    case 'broker':
+    case 'dispatch':
+    case 'customer':
+      return 'Total Sold Qty (Qtl)'
+    default:
+      return 'Total Qty (Qtl)'
+  }
+})
+
+const amountKpiLabel = computed(() => {
+  switch (registerType.value) {
+    case 'supplier':
+    case 'purchase':
+      return 'Total Purchase Val (₹)'
+    case 'broker':
+    case 'dispatch':
+    case 'customer':
+      return 'Total Sales Val (₹)'
+    default:
+      return 'Total Amount (₹)'
+  }
+})
 
 const records = ref([])
 const groups = ref([])
@@ -592,22 +655,56 @@ watch(registerType, () => {
 })
 
 const openNewEntry = () => {
-  if (currentConfig.value.entryRoute) {
+  const sel = records.value[activeRowIndex.value]
+  if (registerType.value === 'broker') {
+    const brokerName = sel ? (sel.broker_name || sel.name) : ''
+    router.push({
+      path: '/voucher/dispatch',
+      query: brokerName ? { broker: brokerName } : {}
+    })
+  } else if (registerType.value === 'supplier') {
+    const supplierName = sel ? (sel.supplier_name || sel.name) : ''
+    router.push({
+      path: '/voucher/purchase',
+      query: supplierName ? { supplier: supplierName } : {}
+    })
+  } else if (registerType.value === 'customer') {
+    const custName = sel ? (sel.customer_name || sel.name) : ''
+    router.push({
+      path: '/voucher/dispatch',
+      query: custName ? { customer: custName } : {}
+    })
+  } else if (currentConfig.value.entryRoute) {
     router.push(currentConfig.value.entryRoute)
   }
 }
 
 const openVoucher = (row) => {
   if (!row || !row.name) return
-  showToast(`Opening ${row.name} (View Mode)`)
   if (registerType.value === 'purchase') {
+    showToast(`Opening ${row.name} (View Mode)`)
     router.push({ path: '/voucher/purchase', query: { id: row.name } })
   } else if (registerType.value === 'dispatch') {
+    showToast(`Opening ${row.name} (View Mode)`)
     router.push({ path: '/voucher/dispatch', query: { id: row.name } })
   } else if (registerType.value === 'payment') {
+    showToast(`Opening ${row.name} (View Mode)`)
     router.push({ path: '/voucher/payment', query: { id: row.name } })
   } else if (registerType.value === 'receipt') {
+    showToast(`Opening ${row.name} (View Mode)`)
     router.push({ path: '/voucher/receipt', query: { id: row.name } })
+  } else if (registerType.value === 'broker') {
+    const bName = row.broker_name || row.name
+    showToast(`Creating New Dispatch for Broker: ${bName}`)
+    router.push({ path: '/voucher/dispatch', query: { broker: bName } })
+  } else if (registerType.value === 'supplier') {
+    const sName = row.supplier_name || row.name
+    showToast(`Creating New Purchase from Supplier: ${sName}`)
+    router.push({ path: '/voucher/purchase', query: { supplier: sName } })
+  } else if (registerType.value === 'customer') {
+    const cName = row.customer_name || row.name
+    showToast(`Creating New Dispatch for Customer: ${cName}`)
+    router.push({ path: '/voucher/dispatch', query: { customer: cName } })
   }
 }
 

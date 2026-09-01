@@ -1145,7 +1145,26 @@ const promptAcceptVoucher = () => {
   )
 }
 
-watch([() => route.params.type, () => route.query.id], () => {
+const initPrepopulatedQueryParams = () => {
+  if (route.query.broker) {
+    form.broker = route.query.broker
+    showToast(`Broker "${route.query.broker}" pre-selected`)
+  }
+  if (route.query.supplier) {
+    form.supplier = route.query.supplier
+    showToast(`Supplier "${route.query.supplier}" pre-selected`)
+  }
+  if (route.query.customer) {
+    form.customer = route.query.customer
+    form.customer_name = route.query.customer
+    showToast(`Customer "${route.query.customer}" pre-selected`)
+  }
+  if (route.query.sugar_purchase) {
+    form.sugar_purchase = route.query.sugar_purchase
+  }
+}
+
+watch([() => route.params.type, () => route.query.id, () => route.query.broker, () => route.query.supplier, () => route.query.customer], () => {
   if (voucherId.value) {
     loadVoucherData()
   } else {
@@ -1159,6 +1178,7 @@ watch([() => route.params.type, () => route.query.id], () => {
     form.vehicle_no = ''
     form.narration = ''
     selectedPurchaseLot.value = null
+    initPrepopulatedQueryParams()
   }
 })
 
@@ -1168,6 +1188,7 @@ onMounted(() => {
   if (voucherId.value) {
     loadVoucherData()
   } else {
+    initPrepopulatedQueryParams()
     nextTick(() => {
       const seq = getFieldSequence()
       const firstField = seq[1] || 'date'
