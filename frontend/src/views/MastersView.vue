@@ -77,30 +77,32 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useFrappeApi } from '../composables/useFrappeApi'
 import MenuPanel from '../components/common/MenuPanel.vue'
 
+const route = useRoute()
 const router = useRouter()
 const { searchLedgers } = useFrappeApi()
 
-const activeTab = ref('Supplier')
+const initialTab = (route.query.tab || route.query.type || 'Item').toString()
+const activeTab = ref(initialTab)
 const searchQuery = ref('')
 const allItems = ref([])
 const activeMenuIndex = ref(0)
 
 const tabs = [
+  { type: 'Item', label: 'Items & Sugar Grades' },
   { type: 'Supplier', label: 'Suppliers (Mills)' },
   { type: 'Customer', label: 'Customers (Buyers)' },
   { type: 'Broker', label: 'Brokers' },
-  { type: 'Item', label: 'Items & Sugar Grades' },
   { type: 'Account', label: 'Bank & Cash Accounts' },
 ]
 
 const currentTabLabel = computed(() => {
   const found = tabs.find(t => t.type === activeTab.value)
-  return found ? found.label : 'Masters'
+  return found ? found.label : 'Items & Sugar Grades'
 })
 
 const filteredItems = computed(() => {
@@ -115,13 +117,22 @@ const filteredItems = computed(() => {
 const setTab = async (type) => {
   activeTab.value = type
   searchQuery.value = ''
+  if (route.query.tab !== type) {
+    router.replace({ query: { ...route.query, tab: type } })
+  }
   allItems.value = await searchLedgers('', type)
 }
 
+watch(() => route.query.tab, (newTab) => {
+  if (newTab && newTab !== activeTab.value) {
+    setTab(newTab)
+  }
+})
+
 const mastersMenuItems = [
-  { key: 'P', label: 'Sugar Purchase (F9)', action: () => router.push('/voucher/purchase') },
-  { key: 'D', label: 'Dispatch Entry (F8)', action: () => router.push('/voucher/dispatch') },
-  { key: 'B', label: 'Day Book (F10)', action: () => router.push('/daybook') },
+  { key: 'P', label: 'Sugar Purchase (P)', action: () => router.push('/voucher/purchase') },
+  { key: 'D', label: 'Dispatch Entry (D)', action: () => router.push('/voucher/dispatch') },
+  { key: 'B', label: 'Day Book (B)', action: () => router.push('/daybook') },
   { key: 'Esc', label: 'Gateway Menu', action: () => router.push('/') },
 ]
 
@@ -138,7 +149,8 @@ const handleKeyDown = (e) => {
 }
 
 onMounted(() => {
-  setTab('Supplier')
+  const targetTab = (route.query.tab || route.query.type || 'Item').toString()
+  setTab(targetTab)
   window.addEventListener('keydown', handleKeyDown)
 })
 

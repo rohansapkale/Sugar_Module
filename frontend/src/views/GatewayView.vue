@@ -470,7 +470,7 @@ const flatMenuItems = [
   { key: 'S', action: () => router.push('/register/supplier') },
   { key: 'B', action: () => router.push('/register/broker') },
   { key: 'C', action: () => router.push('/register/customer') },
-  { key: 'I', action: () => router.push('/masters') },
+  { key: 'I', action: () => router.push('/masters?tab=Item') },
   // Reports
   { key: 'L', action: () => router.push('/register/purchase') },
   { key: 'K', action: () => router.push('/register/dispatch') },

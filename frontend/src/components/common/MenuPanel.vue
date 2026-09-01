@@ -51,11 +51,11 @@
           <span class="label"><span class="hotkey-char">C</span>ustomer Parties</span>
           <span class="key-gold">C</span>
         </div>
-        <div class="sidebar-row" @click="navigate('/masters')">
+        <div class="sidebar-row" @click="navigate('/masters?tab=Item')">
           <span class="label">Sugar <span class="hotkey-char">I</span>tems &amp; Grades</span>
           <span class="key-gold">I</span>
         </div>
-        <div class="sidebar-row" @click="navigate('/masters')">
+        <div class="sidebar-row" @click="navigate('/masters?tab=Item')">
           <span class="label"><span class="hotkey-char">M</span>asters Directory</span>
           <span class="key-gold">M</span>
         </div>

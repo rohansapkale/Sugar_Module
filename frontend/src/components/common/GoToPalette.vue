@@ -56,7 +56,8 @@ const MENU_COMMANDS = [
   { title: 'Broker Party Payment Register (Receipts List)', route: '/register/receipt', shortcut: 'R', category: 'Register' },
   { title: 'Day Book & Transaction Audit Register', route: '/daybook', shortcut: 'B / F10', category: 'Report' },
   { title: 'Gateway of Sugar Module', route: '/', shortcut: 'Esc', category: 'Navigation' },
-  { title: 'Masters Directory (Suppliers, Customers, Brokers, Items)', route: '/masters', shortcut: 'M', category: 'Masters' },
+  { title: 'Sugar Items & Grades (M-30, S-30, SS-30)', route: '/masters?tab=Item', shortcut: 'I', category: 'Masters' },
+  { title: 'Masters Directory (Items, Suppliers, Customers, Brokers)', route: '/masters?tab=Item', shortcut: 'M', category: 'Masters' },
   { title: 'getMyErp (ERPNext Desk)', externalUrl: '/desk/rajendra-narahari-lokhande', shortcut: 'getMyErp', category: 'System' },
 ]
 
