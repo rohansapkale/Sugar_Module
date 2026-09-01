@@ -138,7 +138,7 @@
             <th style="width: 14%;">Dispatch ID</th>
             <th style="width: 10%;">Date</th>
             <th style="width: 20%;">Customer Party</th>
-            <th style="width: 16%;">Broker</th>
+            <th style="width: 16%;">Broker Name</th>
             <th style="width: 10%; text-align: right;">Qty (Qtl)</th>
             <th style="width: 10%; text-align: right;">Rate (₹)</th>
             <th style="width: 10%; text-align: right;">Total Amount</th>
@@ -156,7 +156,7 @@
             <td style="font-family: monospace; font-weight: 700; color: var(--navy);">{{ r.name }}</td>
             <td>{{ r.dispatch_date || '—' }}</td>
             <td style="font-weight: 600;">{{ r.customer_name }}</td>
-            <td>{{ r.broker || '—' }}</td>
+            <td style="font-weight: 600; color: var(--navy);">{{ r.broker_name || r.broker || '—' }}</td>
             <td style="text-align: right; font-family: monospace; font-weight: 600;">{{ formatNumber(r.dispatch_qty_quintal) }}</td>
             <td style="text-align: right; font-family: monospace;">₹{{ formatNumber(r.rate) }}</td>
             <td style="text-align: right; font-family: monospace; font-weight: 700; color: var(--navy);">₹{{ formatCurrency(r.total_amount) }}</td>
@@ -200,13 +200,14 @@
       <table v-else-if="registerType === 'receipt' && records.length" class="daybook-table">
         <thead>
           <tr>
-            <th style="width: 15%;">Receipt ID</th>
-            <th style="width: 11%;">Date</th>
-            <th style="width: 22%;">Customer Party</th>
-            <th style="width: 18%;">Dispatch Ref</th>
-            <th style="width: 10%;">Mode</th>
-            <th style="width: 12%;">UTR / Ref No.</th>
-            <th style="width: 12%; text-align: right;">Received Amount</th>
+            <th style="width: 14%;">Receipt ID</th>
+            <th style="width: 10%;">Date</th>
+            <th style="width: 20%;">Customer Party</th>
+            <th style="width: 16%;">Broker Name</th>
+            <th style="width: 14%;">Dispatch Ref</th>
+            <th style="width: 8%;">Mode</th>
+            <th style="width: 9%;">UTR / Ref No.</th>
+            <th style="width: 9%; text-align: right;">Received Amount</th>
           </tr>
         </thead>
         <tbody>
@@ -217,12 +218,13 @@
             @click="activeRowIndex = idx"
           >
             <td style="font-family: monospace; font-weight: 700; color: var(--navy);">{{ r.name }}</td>
-            <td>{{ r.receipt_date || '—' }}</td>
+            <td>{{ r.payment_date || r.receipt_date || '—' }}</td>
             <td style="font-weight: 600;">{{ r.customer }}</td>
+            <td style="font-weight: 600; color: var(--navy);">{{ r.broker_name || r.broker || '—' }}</td>
             <td style="font-family: monospace; color: var(--blue);">{{ r.dispatch_entry || '—' }}</td>
-            <td><span class="code-badge">{{ r.mode_of_payment || 'Bank' }}</span></td>
-            <td style="font-family: monospace;">{{ r.reference_no || '—' }}</td>
-            <td style="text-align: right; font-family: monospace; font-weight: 700; color: var(--green);">₹{{ formatCurrency(r.received_amount) }}</td>
+            <td><span class="code-badge">{{ r.payment_mode || r.mode_of_payment || 'Bank' }}</span></td>
+            <td style="font-family: monospace;">{{ r.utr_no || r.reference_no || '—' }}</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: var(--green);">₹{{ formatCurrency(r.paid_amount || r.received_amount) }}</td>
           </tr>
         </tbody>
       </table>
