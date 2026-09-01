@@ -460,7 +460,7 @@
       <!-- Bottom Hint Bar -->
       <div class="keyboard-hint" style="margin-top: 18px;">
         <span><kbd>↑</kbd> <kbd>↓</kbd> Select Row</span>
-        <span><kbd>Enter</kbd> Open Voucher</span>
+        <span><kbd>Enter</kbd> Open {{ bottomActionLabel }}</span>
         <span><kbd>Esc</kbd> Return to Gateway</span>
         <span><kbd>Alt+G</kbd> Go To Search</span>
       </div>
@@ -560,6 +560,21 @@ const currentConfig = computed(() => REGISTER_CONFIGS[registerType.value] || REG
 const registerTitle = computed(() => currentConfig.value.title)
 const companyName = computed(() => bootState.default_company || 'Mahalaxmi Sugar Mills Pvt. Ltd.')
 
+const bottomActionLabel = computed(() => {
+  switch (registerType.value) {
+    case 'supplier': return 'Supplier Register'
+    case 'broker': return 'Broker Register'
+    case 'customer': return 'Customer Register'
+    case 'purchase': return 'Purchase Voucher'
+    case 'dispatch': return 'Dispatch Voucher'
+    case 'payment': return 'Payment Entry'
+    case 'receipt': return 'Receipt Entry'
+    case 'broker-outstanding': return 'Broker Statement'
+    case 'supplier-outstanding': return 'Supplier Statement'
+    default: return 'Register'
+  }
+})
+
 const searchPlaceholder = computed(() => {
   switch (registerType.value) {
     case 'supplier': return 'Search Supplier...'
@@ -633,6 +648,9 @@ const formatNumber = (val) => {
 }
 
 const loadData = async () => {
+  if ((route.query.search || route.query.query) && !searchQuery.value) {
+    searchQuery.value = (route.query.search || route.query.query).toString()
+  }
   const res = await getRegisterData(currentConfig.value.voucherType, searchQuery.value)
   if (res) {
     records.value = res.records || []
@@ -651,8 +669,8 @@ const filterDebounce = () => {
   }, 120)
 }
 
-watch(registerType, () => {
-  searchQuery.value = ''
+watch([registerType, () => route.query.search, () => route.query.query], () => {
+  searchQuery.value = (route.query.search || route.query.query || '').toString()
   loadData()
 })
 
@@ -697,16 +715,16 @@ const openVoucher = (row) => {
     router.push({ path: '/voucher/receipt', query: { id: row.name } })
   } else if (registerType.value === 'broker') {
     const bName = row.broker_name || row.name
-    showToast(`Creating New Dispatch for Broker: ${bName}`)
-    router.push({ path: '/voucher/dispatch', query: { broker: bName } })
+    showToast(`Opening Broker Register for: ${bName}`)
+    router.push({ path: '/register/dispatch', query: { search: bName } })
   } else if (registerType.value === 'supplier') {
     const sName = row.supplier_name || row.name
-    showToast(`Creating New Purchase from Supplier: ${sName}`)
-    router.push({ path: '/voucher/purchase', query: { supplier: sName } })
+    showToast(`Opening Supplier Register for: ${sName}`)
+    router.push({ path: '/register/purchase', query: { search: sName } })
   } else if (registerType.value === 'customer') {
     const cName = row.customer_name || row.name
-    showToast(`Creating New Dispatch for Customer: ${cName}`)
-    router.push({ path: '/voucher/dispatch', query: { customer: cName } })
+    showToast(`Opening Customer Register for: ${cName}`)
+    router.push({ path: '/register/dispatch', query: { search: cName } })
   }
 }
 
